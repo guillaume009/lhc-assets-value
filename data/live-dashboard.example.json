@@ -1,0 +1,62 @@
+{
+  "teamName": "Quebec Voyageurs",
+  "roster": [
+    {
+      "id": "voy-01",
+      "name": "Alexei Volkov",
+      "team": "Quebec Voyageurs",
+      "position": "C",
+      "role": "First-line play driver",
+      "age": 27,
+      "capHit": 8.4,
+      "yearsRemaining": 1,
+      "contractStatus": "ufa",
+      "performance": 91,
+      "playDriving": 88,
+      "defense": 71,
+      "specialTeams": 86,
+      "chemistryFit": 84,
+      "upside": 74
+    }
+  ],
+  "leagueTargets": [
+    {
+      "id": "oth-01",
+      "name": "Dylan Ritchie",
+      "team": "Halifax Admirals",
+      "position": "LD",
+      "role": "Top-four transition defender",
+      "age": 26,
+      "capHit": 4.4,
+      "yearsRemaining": 2,
+      "contractStatus": "signed",
+      "performance": 77,
+      "playDriving": 82,
+      "defense": 74,
+      "specialTeams": 68,
+      "chemistryFit": 79,
+      "upside": 72
+    }
+  ],
+  "draftPicks": [
+    {
+      "id": "pick-2027-1",
+      "team": "Quebec Voyageurs",
+      "season": 2027,
+      "round": 1,
+      "projectedSlot": 9
+    }
+  ],
+  "draftOrders": [
+    {
+      "team": "Quebec Voyageurs",
+      "season": 2026,
+      "projectedSlot": 9
+    },
+    {
+      "team": "Halifax Admirals",
+      "season": 2026,
+      "projectedSlot": 12
+    }
+  ]
+}

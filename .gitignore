@@ -33,6 +33,10 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# local live data cache
+/data/live-dashboard.json
+/data/playhockeyonline-players.raw.json
+
 # vercel
 .vercel
 
