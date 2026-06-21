@@ -1,5 +1,5 @@
 {
-  "importedAt": "2026-05-24T23:36:12.036Z",
+  "importedAt": "2026-05-25T01:31:21.339Z",
   "data": {
     "33": {
       "capHit": 4.4,
@@ -2601,12 +2601,202 @@
       "yearsRemaining": 0,
       "contractStatus": "ufa"
     },
+    "4235": {
+      "capHit": 8.07,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4236": {
+      "capHit": 0.96,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4237": {
+      "capHit": 1.01,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4238": {
+      "capHit": 0.75,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
     "4242": {
       "capHit": 0.75,
       "yearsRemaining": 0,
       "contractStatus": "signed"
     },
+    "4243": {
+      "capHit": 0.93,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4253": {
+      "capHit": 0.9,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4256": {
+      "capHit": 1.08,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4260": {
+      "capHit": 4.4,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4266": {
+      "capHit": 6.56,
+      "yearsRemaining": 3,
+      "contractStatus": "signed"
+    },
+    "4270": {
+      "capHit": 0.83,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4273": {
+      "capHit": 1.78,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4276": {
+      "capHit": 0.75,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4277": {
+      "capHit": 0.75,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4280": {
+      "capHit": 2.41,
+      "yearsRemaining": 1,
+      "contractStatus": "signed"
+    },
+    "4281": {
+      "capHit": 1.02,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4283": {
+      "capHit": 5.18,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4284": {
+      "capHit": 0.79,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4286": {
+      "capHit": 5.68,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4287": {
+      "capHit": 0.83,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4289": {
+      "capHit": 1.61,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4290": {
+      "capHit": 0.83,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4292": {
+      "capHit": 4.5,
+      "yearsRemaining": 3,
+      "contractStatus": "signed"
+    },
+    "4293": {
+      "capHit": 1.09,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4295": {
+      "capHit": 0.75,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4299": {
+      "capHit": 7.2,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4301": {
+      "capHit": 0.96,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4305": {
+      "capHit": 1.51,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
     "4310": {
+      "capHit": 0.75,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4314": {
+      "capHit": 0.9,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4316": {
+      "capHit": 4.1,
+      "yearsRemaining": 0,
+      "contractStatus": "signed"
+    },
+    "4321": {
+      "capHit": 0.83,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4325": {
+      "capHit": 0.75,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4333": {
+      "capHit": 1.41,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4337": {
+      "capHit": 3.38,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4338": {
+      "capHit": 1.01,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4343": {
+      "capHit": 0.75,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4349": {
+      "capHit": 0.75,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4352": {
+      "capHit": 0.81,
+      "yearsRemaining": 0,
+      "contractStatus": "ufa"
+    },
+    "4354": {
       "capHit": 0.75,
       "yearsRemaining": 0,
       "contractStatus": "ufa"
@@ -3892,6 +4082,16 @@
       "contractStatus": "signed"
     },
     "11588": {
+      "capHit": 0.78,
+      "yearsRemaining": 1,
+      "contractStatus": "signed"
+    },
+    "11676": {
+      "capHit": 0.78,
+      "yearsRemaining": 1,
+      "contractStatus": "signed"
+    },
+    "11695": {
       "capHit": 0.78,
       "yearsRemaining": 1,
       "contractStatus": "signed"
