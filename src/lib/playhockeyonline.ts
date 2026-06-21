@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { DashboardInput, DraftPick, Player, Position } from "@/lib/domain";
@@ -9,6 +9,10 @@ const DEFAULT_DRAFT_PICKS_API_URL = "https://playhockeyonline.com/api/draft_pick
 const DEFAULT_RAW_CACHE_PATH = path.join(process.cwd(), "data", "playhockeyonline-players.raw.json");
 const DEFAULT_CONTRACT_CACHE_PATH = path.join(process.cwd(), "data", "playhockeyonline-player-contracts.raw.json");
 const DEFAULT_PHO_REQUEST_TIMEOUT_MS = 15_000;
+const DEFAULT_PHO_PAGE_FETCH_CONCURRENCY = 4;
+const DEFAULT_PHO_CONTRACT_FETCH_CONCURRENCY = 4;
+const DEFAULT_PHO_MAX_MISSING_CONTRACT_FETCHES = 250;
+const PHO_FILE_CACHE_TTL_MS = 300_000;
 
 type PhoFetchSummary = {
   status: number;
@@ -86,6 +90,14 @@ type PhoDashboardImportResult = {
   currentTeamId: number | null;
 };
 
+type CachedFileData<T> = {
+  filePath: string;
+  mtimeMs: number;
+  size: number;
+  expiresAt: number;
+  data: T;
+};
+
 type PhoTeam = {
   id: number;
   name: string;
@@ -110,13 +122,28 @@ type PhoDraftPick = {
   } | null;
 };
 
+type PhoDraftPickTeamRef = NonNullable<PhoDraftPick["owner"]>;
+
 type PhoDraftPickSeason = {
   year: number;
   draft_picks: PhoDraftPick[];
 };
 
+let cachedPhoContractSnapshots: CachedFileData<Map<number, PhoContractSnapshot>> | null = null;
+let cachedPhoSimulationStats: CachedFileData<Map<number, NonNullable<Player["simulationStats"]>>> | null = null;
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
+
+const parseNonNegativeInteger = (value: string | undefined, fallback: number) => {
+  const parsed = Number(value);
+
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return fallback;
+  }
+
+  return Math.floor(parsed);
+};
 
 const getPhoRequestTimeoutMs = () => {
   const configuredTimeout = Number(process.env.PHO_REQUEST_TIMEOUT_MS);
@@ -127,6 +154,24 @@ const getPhoRequestTimeoutMs = () => {
 
   return Math.round(configuredTimeout);
 };
+
+const getPhoPageFetchConcurrency = () =>
+  Math.max(1, parseNonNegativeInteger(process.env.PHO_PAGE_FETCH_CONCURRENCY, DEFAULT_PHO_PAGE_FETCH_CONCURRENCY));
+
+const getPhoContractFetchConcurrency = () =>
+  Math.max(
+    1,
+    parseNonNegativeInteger(
+      process.env.PHO_CONTRACT_FETCH_CONCURRENCY,
+      DEFAULT_PHO_CONTRACT_FETCH_CONCURRENCY,
+    ),
+  );
+
+const getPhoMaxMissingContractFetches = () =>
+  parseNonNegativeInteger(
+    process.env.PHO_IMPORT_MAX_MISSING_CONTRACT_FETCHES,
+    DEFAULT_PHO_MAX_MISSING_CONTRACT_FETCHES,
+  );
 
 const logPhoActivity = (event: string, details?: Record<string, unknown>) => {
   if (details) {
@@ -346,8 +391,22 @@ const summarizePayload = (
 
 const persistRawPayload = async (payload: unknown) => {
   const rawFilePath = getRawCachePath();
+  const serializedPayload = `${JSON.stringify(payload, null, 2)}\n`;
   await mkdir(path.dirname(rawFilePath), { recursive: true });
-  await writeFile(rawFilePath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
+  await writeFile(rawFilePath, serializedPayload, "utf8");
+
+  if (isRecord(payload) && Array.isArray(payload.data) && payload.data.every(isPhoPlayer)) {
+    cachedPhoSimulationStats = {
+      filePath: rawFilePath,
+      mtimeMs: (await stat(rawFilePath)).mtimeMs,
+      size: Buffer.byteLength(serializedPayload, "utf8"),
+      expiresAt: Date.now() + PHO_FILE_CACHE_TTL_MS,
+      data: new Map(payload.data.map((player) => [player.id, getSimulationStatsFromPhoPlayer(player)])),
+    };
+  } else {
+    cachedPhoSimulationStats = null;
+  }
+
   return rawFilePath;
 };
 
@@ -406,15 +465,30 @@ const getPhoContractSnapshot = (payload: unknown): PhoContractSnapshot | null =>
 };
 
 const readPhoContractCache = async (): Promise<Map<number, PhoContractSnapshot>> => {
+  const filePath = getContractCachePath();
+
   try {
-    const raw = await readFile(getContractCachePath(), "utf8");
+    const fileStats = await stat(filePath);
+    const cachedSnapshots = cachedPhoContractSnapshots;
+
+    if (
+      cachedSnapshots &&
+      cachedSnapshots.filePath === filePath &&
+      cachedSnapshots.mtimeMs === fileStats.mtimeMs &&
+      cachedSnapshots.size === fileStats.size &&
+      cachedSnapshots.expiresAt > Date.now()
+    ) {
+      return cachedSnapshots.data;
+    }
+
+    const raw = await readFile(filePath, "utf8");
     const parsed: unknown = JSON.parse(raw);
 
     if (!isRecord(parsed) || !isRecord(parsed.data)) {
       return new Map();
     }
 
-    return new Map(
+    const snapshots = new Map(
       Object.entries(parsed.data)
         .map(([playerId, snapshot]) => {
           const numericPlayerId = Number(playerId);
@@ -433,6 +507,16 @@ const readPhoContractCache = async (): Promise<Map<number, PhoContractSnapshot>>
         })
         .filter((entry): entry is readonly [number, PhoContractSnapshot] => entry !== null),
     );
+
+    cachedPhoContractSnapshots = {
+      filePath,
+      mtimeMs: fileStats.mtimeMs,
+      size: fileStats.size,
+      expiresAt: Date.now() + PHO_FILE_CACHE_TTL_MS,
+      data: snapshots,
+    };
+
+    return snapshots;
   } catch {
     return new Map();
   }
@@ -441,22 +525,26 @@ const readPhoContractCache = async (): Promise<Map<number, PhoContractSnapshot>>
 const writePhoContractCache = async (snapshotsById: Map<number, PhoContractSnapshot>) => {
   const rawFilePath = getContractCachePath();
   await mkdir(path.dirname(rawFilePath), { recursive: true });
-  await writeFile(
-    rawFilePath,
-    `${JSON.stringify(
-      {
-        importedAt: new Date().toISOString(),
-        data: Object.fromEntries(
-          [...snapshotsById.entries()]
-            .sort((left, right) => left[0] - right[0])
-            .map(([playerId, snapshot]) => [String(playerId), snapshot]),
-        ),
-      },
-      null,
-      2,
-    )}\n`,
-    "utf8",
-  );
+  const payload = {
+    importedAt: new Date().toISOString(),
+    data: Object.fromEntries(
+      [...snapshotsById.entries()]
+        .sort((left, right) => left[0] - right[0])
+        .map(([playerId, snapshot]) => [String(playerId), snapshot]),
+    ),
+  };
+  const serializedPayload = `${JSON.stringify(payload, null, 2)}\n`;
+
+  await writeFile(rawFilePath, serializedPayload, "utf8");
+  const fileStats = await stat(rawFilePath);
+
+  cachedPhoContractSnapshots = {
+    filePath: rawFilePath,
+    mtimeMs: fileStats.mtimeMs,
+    size: Buffer.byteLength(serializedPayload, "utf8"),
+    expiresAt: Date.now() + PHO_FILE_CACHE_TTL_MS,
+    data: new Map(snapshotsById),
+  };
 };
 
 const fetchPhoPlayerContractSnapshot = async (
@@ -709,6 +797,23 @@ const readExistingDraftPicks = async (): Promise<DraftPick[]> => {
 
 const getDefaultProjectedSlot = () => 16;
 
+const getPhoTeamLabel = (
+  team: PhoDraftPickTeamRef | null | undefined,
+  teamNamesById: Map<number, string>,
+) => {
+  if (!team) {
+    return null;
+  }
+
+  const fullName = [team.city, team.name].filter(Boolean).join(" ").trim();
+
+  if (fullName) {
+    return fullName;
+  }
+
+  return teamNamesById.get(team.id) ?? `Team ${team.id}`;
+};
+
 const getDraftPickIssuerLabel = (pick: PhoDraftPick, fallbackTeamName: string) => {
   if (pick.issuer_name?.trim()) {
     return pick.issuer_name.trim();
@@ -727,6 +832,48 @@ const getSimulationStatsFromPhoPlayer = (player: PhoPlayer) =>
     }))
     .sort((left, right) => right.value - left.value || left.key.localeCompare(right.key));
 
+const readPhoSimulationStatsCache = async (): Promise<Map<number, NonNullable<Player["simulationStats"]>>> => {
+  const filePath = getRawCachePath();
+
+  try {
+    const fileStats = await stat(filePath);
+    const cachedStats = cachedPhoSimulationStats;
+
+    if (
+      cachedStats &&
+      cachedStats.filePath === filePath &&
+      cachedStats.mtimeMs === fileStats.mtimeMs &&
+      cachedStats.size === fileStats.size &&
+      cachedStats.expiresAt > Date.now()
+    ) {
+      return cachedStats.data;
+    }
+
+    const raw = await readFile(filePath, "utf8");
+    const parsed: unknown = JSON.parse(raw);
+
+    if (!isRecord(parsed) || !Array.isArray(parsed.data) || !parsed.data.every(isPhoPlayer)) {
+      return new Map();
+    }
+
+    const statsByPlayerId = new Map(
+      parsed.data.map((player) => [player.id, getSimulationStatsFromPhoPlayer(player)]),
+    );
+
+    cachedPhoSimulationStats = {
+      filePath,
+      mtimeMs: fileStats.mtimeMs,
+      size: fileStats.size,
+      expiresAt: Date.now() + PHO_FILE_CACHE_TTL_MS,
+      data: statsByPlayerId,
+    };
+
+    return statsByPlayerId;
+  } catch {
+    return new Map();
+  }
+};
+
 export const hydratePhoPlayerSimulationStats = async (players: Player[]): Promise<Player[]> => {
   const missingPhoPlayers = players.filter(
     (player) => (!player.simulationStats || player.simulationStats.length === 0) && player.id.startsWith(PHO_PLAYER_ID_PREFIX),
@@ -737,16 +884,7 @@ export const hydratePhoPlayerSimulationStats = async (players: Player[]): Promis
   }
 
   try {
-    const raw = await readFile(getRawCachePath(), "utf8");
-    const parsed: unknown = JSON.parse(raw);
-
-    if (!isRecord(parsed) || !Array.isArray(parsed.data) || !parsed.data.every(isPhoPlayer)) {
-      return players;
-    }
-
-    const statsByPlayerId = new Map(
-      parsed.data.map((player) => [player.id, getSimulationStatsFromPhoPlayer(player)]),
-    );
+    const statsByPlayerId = await readPhoSimulationStatsCache();
 
     let didChange = false;
     const hydratedPlayers = players.map((player) => {
@@ -799,6 +937,9 @@ export const hydratePhoPlayerContracts = async (
   const contractSnapshotsById = await readPhoContractCache();
   const missingPlayerIds = [...new Set(phoPlayerIds)].filter((playerId) => !contractSnapshotsById.has(playerId));
   const shouldFetchMissing = options?.fetchMissing ?? true;
+  const maxMissingContractFetches = getPhoMaxMissingContractFetches();
+  const fetchableMissingPlayerIds = missingPlayerIds.slice(0, maxMissingContractFetches);
+  const skippedMissingPlayerCount = missingPlayerIds.length - fetchableMissingPlayerIds.length;
 
   if (shouldFetchMissing && missingPlayerIds.length > 0) {
     const variants =
@@ -806,10 +947,29 @@ export const hydratePhoPlayerContracts = async (
         ? getAuthorizationVariants()
         : [{ label: "explicit-authorization", value: authorizationValue }];
 
+    logPhoActivity("contract-hydration:start", {
+      cachedContractCount: contractSnapshotsById.size,
+      missingPlayerCount: missingPlayerIds.length,
+      fetchableMissingPlayerCount: fetchableMissingPlayerIds.length,
+      skippedMissingPlayerCount,
+      concurrency: getPhoContractFetchConcurrency(),
+    });
+
+    if (fetchableMissingPlayerIds.length === 0) {
+      logPhoActivity("contract-hydration:skipped", {
+        reason: "max-missing-contract-fetches",
+        skippedMissingPlayerCount,
+      });
+    }
+
     for (const variant of variants) {
+      if (fetchableMissingPlayerIds.length === 0) {
+        break;
+      }
+
       try {
         const fetchedSnapshots = await runTasksWithConcurrencyLimit(
-          missingPlayerIds.map((playerId) => async () => {
+          fetchableMissingPlayerIds.map((playerId) => async () => {
             try {
               return {
                 playerId,
@@ -826,10 +986,11 @@ export const hydratePhoPlayerContracts = async (
               };
             }
           }),
-          8,
+          getPhoContractFetchConcurrency(),
         );
 
         let didCacheChange = false;
+        let fetchedSnapshotCount = 0;
 
         for (const result of fetchedSnapshots) {
           if (!result.snapshot) {
@@ -838,14 +999,28 @@ export const hydratePhoPlayerContracts = async (
 
           contractSnapshotsById.set(result.playerId, result.snapshot);
           didCacheChange = true;
+          fetchedSnapshotCount += 1;
         }
 
         if (didCacheChange) {
           await writePhoContractCache(contractSnapshotsById);
         }
 
+        logPhoActivity("contract-hydration:success", {
+          authVariant: variant.label,
+          fetchedSnapshotCount,
+          skippedMissingPlayerCount,
+          cacheSize: contractSnapshotsById.size,
+        });
+
         break;
       } catch (error) {
+        logPhoFailure("contract-hydration:error", error, {
+          authVariant: variant.label,
+          fetchableMissingPlayerCount: fetchableMissingPlayerIds.length,
+          skippedMissingPlayerCount,
+        });
+
         if (!(error instanceof Error) || error.message !== "Unauthenticated") {
           break;
         }
@@ -939,20 +1114,29 @@ const normalizePhoDraftPicks = (
   seasons: PhoDraftPickSeason[],
   currentTeamId: number,
   currentTeamName: string,
+  teamNamesById: Map<number, string>,
 ): DraftPick[] =>
   seasons
     .flatMap((season) => season.draft_picks)
-    .filter((pick) => pick.owner?.id === currentTeamId)
-    .map((pick) => ({
-      id: `pho-pick-${pick.id}`,
-      team: currentTeamName,
-      issuerTeam: getDraftPickIssuerLabel(pick, currentTeamName),
-      season: pick.year,
-      round: pick.round,
-      projectedSlot: pick.rank ?? getDefaultProjectedSlot(),
-    }))
+    .filter((pick) => pick.owner?.id !== undefined)
+    .map((pick) => {
+      const team =
+        pick.owner?.id === currentTeamId
+          ? currentTeamName
+          : getPhoTeamLabel(pick.owner, teamNamesById) ?? currentTeamName;
+
+      return {
+        id: `pho-pick-${pick.id}`,
+        team,
+        issuerTeam: getDraftPickIssuerLabel(pick, team),
+        season: pick.year,
+        round: pick.round,
+        projectedSlot: pick.rank ?? getDefaultProjectedSlot(),
+      };
+    })
     .sort(
       (left, right) =>
+        left.team.localeCompare(right.team) ||
         left.season - right.season ||
         (left.issuerTeam ?? left.team).localeCompare(right.issuerTeam ?? right.team) ||
         left.round - right.round ||
@@ -978,6 +1162,40 @@ const fetchPlayersPage = async (url: string, authorizationValue: string | null) 
   }
 
   return { response, payload };
+};
+
+const fetchRemainingPlayersPages = async (
+  lastPage: number,
+  authorizationValue: string | null,
+): Promise<PhoPlayersPage[]> => {
+  if (lastPage <= 1) {
+    return [];
+  }
+
+  const pageNumbers = Array.from({ length: lastPage - 1 }, (_, index) => index + 2);
+  const concurrency = getPhoPageFetchConcurrency();
+
+  logPhoActivity("players-pagination:start", {
+    remainingPageCount: pageNumbers.length,
+    concurrency,
+  });
+
+  const pages = await runTasksWithConcurrencyLimit(
+    pageNumbers.map((pageNumber) => async () => {
+      const pageUrl = new URL(getPlayersApiUrl());
+      pageUrl.searchParams.set("page", String(pageNumber));
+      const nextPage = await fetchPlayersPage(pageUrl.toString(), authorizationValue);
+      return nextPage.payload;
+    }),
+    concurrency,
+  );
+
+  logPhoActivity("players-pagination:success", {
+    remainingPageCount: pageNumbers.length,
+    concurrency,
+  });
+
+  return pages;
 };
 
 export const importPhoPlayers = async (): Promise<PhoImportResult> => {
@@ -1030,14 +1248,8 @@ export const importPhoDashboard = async (): Promise<PhoDashboardImportResult> =>
       const teamNamesById = new Map(
         teams.map((team) => [team.id, `${team.city} ${team.name}`.trim()] as const),
       );
-      const pages: PhoPlayersPage[] = [firstPage.payload];
-
-      for (let pageNumber = 2; pageNumber <= firstPage.payload.last_page; pageNumber += 1) {
-        const pageUrl = new URL(getPlayersApiUrl());
-        pageUrl.searchParams.set("page", String(pageNumber));
-        const nextPage = await fetchPlayersPage(pageUrl.toString(), variant.value);
-        pages.push(nextPage.payload);
-      }
+      const remainingPages = await fetchRemainingPlayersPages(firstPage.payload.last_page, variant.value);
+      const pages: PhoPlayersPage[] = [firstPage.payload, ...remainingPages];
 
       const allPlayers = pages.flatMap((page) => page.data).filter((player) => !player.is_retired);
       const rawPayload = {
@@ -1057,7 +1269,7 @@ export const importPhoDashboard = async (): Promise<PhoDashboardImportResult> =>
       const leagueTargets = normalizedPlayers.filter((player) => player.team !== currentTeamName);
       const currentTeamId = allPlayers.find((player) => player.belongs_to_current_team)?.team_id ?? null;
       const draftPicks = currentTeamId
-        ? normalizePhoDraftPicks(draftPickSeasons, currentTeamId, currentTeamName)
+        ? normalizePhoDraftPicks(draftPickSeasons, currentTeamId, currentTeamName, teamNamesById)
         : await readExistingDraftPicks();
 
       logPhoActivity("dashboard-import:success", {
@@ -1102,6 +1314,9 @@ export const getPhoImportConfig = () => ({
   apiUrl: getPlayersApiUrl(),
   rawFilePath: getRawCachePath(),
   contractCachePath: getContractCachePath(),
+  pageFetchConcurrency: getPhoPageFetchConcurrency(),
+  contractFetchConcurrency: getPhoContractFetchConcurrency(),
+  maxMissingContractFetches: getPhoMaxMissingContractFetches(),
   hasBearerToken: Boolean(process.env.PHO_AUTH_BEARER_TOKEN?.trim()),
   authorizationVariants: getAuthorizationVariants().map((variant) => variant.label),
   hasCookie: Boolean(process.env.PHO_AUTH_COOKIE?.trim()),

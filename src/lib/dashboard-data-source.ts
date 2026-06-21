@@ -11,8 +11,12 @@ import type {
   NormalizedDashboardInput,
   Player,
   Position,
+  RealSeasonHistoryEntry,
+  RealSeasonStatsLine,
+  RealSeasonStats,
   ResolvedDashboardInput,
   SimulationStat,
+  TeamFinances,
 } from "@/lib/domain";
 import {
   applyDraftOrdersToPicks,
@@ -20,6 +24,7 @@ import {
   getDraftPickOrderKey,
   type DraftPickOrderUpdate,
 } from "@/lib/draft-pick-order";
+import { getNhlPlayerStatsCachePath, maybeAutoRefreshPlayerRealSeasonStats } from "@/lib/nhl-player-stats";
 import { hydratePhoPlayerContracts, hydratePhoPlayerSimulationStats } from "@/lib/playhockeyonline";
 import { demoDashboardInput } from "@/lib/sample-data";
 import { loadTradeHistory } from "@/lib/trade-history";
@@ -30,7 +35,9 @@ const DEFAULT_LIVE_DATA_PATH = path.join(process.cwd(), "data", "live-dashboard.
 const validPositions: Position[] = ["C", "LW", "RW", "LD", "RD", "G"];
 const validContractStatuses = ["signed", "rfa", "ufa", "prospect"];
 const LIVE_DASHBOARD_CACHE_TTL_MS = 300_000;
+const RESOLVED_INPUT_CACHE_TTL_MS = 300_000;
 const SLOW_DASHBOARD_READ_THRESHOLD_MS = 1_000;
+const SLOW_DASHBOARD_RESOLVE_THRESHOLD_MS = 1_000;
 
 let liveDashboardInputCache:
   | {
@@ -41,6 +48,29 @@ let liveDashboardInputCache:
       expiresAt: number;
     }
   | null = null;
+
+let resolvedDashboardInputCache:
+  | {
+      filePath: string;
+      mtimeMs: number;
+      size: number;
+      statsMtimeMs: number;
+      expiresAt: number;
+      resolved: ResolvedDashboardInput;
+    }
+  | null = null;
+
+let pendingResolvedDashboardInput: Promise<ResolvedDashboardInput> | null = null;
+
+export type LiveDashboardCacheStatus = {
+  filePath: string;
+  ttlMs: number;
+  cachedAt: string | null;
+  expiresAt: string | null;
+  remainingMs: number | null;
+  mtimeMs: number | null;
+  size: number | null;
+};
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -63,6 +93,69 @@ const isNumber = (value: unknown): value is number =>
 const isSimulationStat = (value: unknown): value is SimulationStat =>
   isRecord(value) && typeof value.key === "string" && isNumber(value.value);
 
+const isRealSeasonStatsLine = (value: unknown): value is RealSeasonStatsLine => {
+  if (!isRecord(value) || typeof value.gamesPlayed !== "number") {
+    return false;
+  }
+
+  return (
+    (value.pim === undefined || typeof value.pim === "number") &&
+    (value.goals === undefined || typeof value.goals === "number") &&
+    (value.assists === undefined || typeof value.assists === "number") &&
+    (value.points === undefined || typeof value.points === "number") &&
+    (value.plusMinus === undefined || typeof value.plusMinus === "number") &&
+    (value.powerPlayPoints === undefined || typeof value.powerPlayPoints === "number") &&
+    (value.shots === undefined || typeof value.shots === "number") &&
+    (value.shootingPctg === undefined || typeof value.shootingPctg === "number") &&
+    (value.wins === undefined || typeof value.wins === "number") &&
+    (value.savePctg === undefined || typeof value.savePctg === "number") &&
+    (value.goalsAgainstAvg === undefined || typeof value.goalsAgainstAvg === "number") &&
+    (value.shutouts === undefined || typeof value.shutouts === "number")
+  );
+};
+
+const isRealSeasonHistoryEntry = (value: unknown): value is RealSeasonHistoryEntry => {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    typeof value.seasonId === "number" &&
+    typeof value.teamName === "string" &&
+    typeof value.leagueAbbrev === "string" &&
+    (value.regularSeason === undefined || isRealSeasonStatsLine(value.regularSeason)) &&
+    (value.playoffs === undefined || isRealSeasonStatsLine(value.playoffs))
+  );
+};
+
+const isRealSeasonStats = (value: unknown): value is RealSeasonStats => {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    value.source === "nhl" &&
+    typeof value.refreshedAt === "string" &&
+    typeof value.seasonId === "number" &&
+    typeof value.gamesPlayed === "number" &&
+    typeof value.valueSignal === "number" &&
+    typeof value.nhlPlayerId === "number" &&
+    (value.goals === undefined || typeof value.goals === "number") &&
+    (value.assists === undefined || typeof value.assists === "number") &&
+    (value.points === undefined || typeof value.points === "number") &&
+    (value.plusMinus === undefined || typeof value.plusMinus === "number") &&
+    (value.powerPlayPoints === undefined || typeof value.powerPlayPoints === "number") &&
+    (value.shots === undefined || typeof value.shots === "number") &&
+    (value.shootingPctg === undefined || typeof value.shootingPctg === "number") &&
+    (value.wins === undefined || typeof value.wins === "number") &&
+    (value.savePctg === undefined || typeof value.savePctg === "number") &&
+    (value.goalsAgainstAvg === undefined || typeof value.goalsAgainstAvg === "number") &&
+    (value.shutouts === undefined || typeof value.shutouts === "number") &&
+    (value.seasonHistory === undefined ||
+      (Array.isArray(value.seasonHistory) && value.seasonHistory.every(isRealSeasonHistoryEntry)))
+  );
+};
+
 const isPlayer = (value: unknown): value is Player => {
   if (!isRecord(value)) {
     return false;
@@ -80,6 +173,7 @@ const isPlayer = (value: unknown): value is Player => {
     isNumber(value.yearsRemaining) &&
     typeof value.contractStatus === "string" &&
     validContractStatuses.includes(value.contractStatus) &&
+    (value.inMinors === undefined || typeof value.inMinors === "boolean") &&
     isNumber(value.performance) &&
     isNumber(value.playDriving) &&
     isNumber(value.defense) &&
@@ -87,7 +181,8 @@ const isPlayer = (value: unknown): value is Player => {
     isNumber(value.chemistryFit) &&
     isNumber(value.upside) &&
     (value.simulationStats === undefined ||
-      (Array.isArray(value.simulationStats) && value.simulationStats.every(isSimulationStat)))
+      (Array.isArray(value.simulationStats) && value.simulationStats.every(isSimulationStat))) &&
+    (value.realSeasonStats === undefined || isRealSeasonStats(value.realSeasonStats))
   );
 };
 
@@ -123,6 +218,17 @@ const isDraftOrder = (value: unknown): value is DraftOrder => {
   );
 };
 
+const isTeamFinances = (value: unknown): value is TeamFinances => {
+  if (!isRecord(value)) {
+    return false;
+  }
+
+  return (
+    (value.contractPenalties === undefined || isNumber(value.contractPenalties)) &&
+    (value.injuredRelief === undefined || isNumber(value.injuredRelief))
+  );
+};
+
 const isDashboardInput = (value: unknown): value is DashboardInput => {
   if (!isRecord(value)) {
     return false;
@@ -137,7 +243,8 @@ const isDashboardInput = (value: unknown): value is DashboardInput => {
     Array.isArray(value.draftPicks) &&
     value.draftPicks.every(isDraftPick) &&
     (value.draftOrders === undefined ||
-      (Array.isArray(value.draftOrders) && value.draftOrders.every(isDraftOrder)))
+      (Array.isArray(value.draftOrders) && value.draftOrders.every(isDraftOrder))) &&
+    (value.finances === undefined || isTeamFinances(value.finances))
   );
 };
 
@@ -149,6 +256,34 @@ export const getConfiguredSourceMode = (): DashboardSourceMode =>
 
 export const getConfiguredLiveFilePath = () =>
   process.env.NHL_SIM_LIVE_DATA_PATH?.trim() || DEFAULT_LIVE_DATA_PATH;
+
+export const getLiveDashboardCacheStatus = (): LiveDashboardCacheStatus => {
+  const cachedInput = liveDashboardInputCache;
+
+  if (!cachedInput) {
+    return {
+      filePath: getConfiguredLiveFilePath(),
+      ttlMs: LIVE_DASHBOARD_CACHE_TTL_MS,
+      cachedAt: null,
+      expiresAt: null,
+      remainingMs: null,
+      mtimeMs: null,
+      size: null,
+    };
+  }
+
+  const cachedAtMs = cachedInput.expiresAt - LIVE_DASHBOARD_CACHE_TTL_MS;
+
+  return {
+    filePath: cachedInput.filePath,
+    ttlMs: LIVE_DASHBOARD_CACHE_TTL_MS,
+    cachedAt: new Date(cachedAtMs).toISOString(),
+    expiresAt: new Date(cachedInput.expiresAt).toISOString(),
+    remainingMs: Math.max(cachedInput.expiresAt - Date.now(), 0),
+    mtimeMs: cachedInput.mtimeMs,
+    size: cachedInput.size,
+  };
+};
 
 const readLiveDashboardInput = async (filePath: string) => {
   const startedAt = Date.now();
@@ -212,6 +347,97 @@ const getDemoSourceInfo = (
   liveFilePath,
 });
 
+const resolveLiveDashboardInput = async (
+  configuredMode: DashboardSourceMode,
+  liveFilePath: string,
+): Promise<ResolvedDashboardInput> => {
+  const startedAt = Date.now();
+  const fileStats = await stat(liveFilePath);
+  // Include the NHL stats cache mtime in the cache key so that when the
+  // background refresh writes new entries to disk, the next resolve picks
+  // them up immediately instead of waiting for the 5 min TTL to expire.
+  const statsMtimeMs = await stat(getNhlPlayerStatsCachePath())
+    .then((value) => value.mtimeMs)
+    .catch(() => 0);
+  const cachedResolved = resolvedDashboardInputCache;
+
+  if (
+    cachedResolved &&
+    cachedResolved.filePath === liveFilePath &&
+    cachedResolved.mtimeMs === fileStats.mtimeMs &&
+    cachedResolved.size === fileStats.size &&
+    cachedResolved.statsMtimeMs === statsMtimeMs &&
+    cachedResolved.expiresAt > Date.now()
+  ) {
+    return cachedResolved.resolved;
+  }
+
+  const input = await readLiveDashboardInput(liveFilePath);
+  const autoRefresh = await maybeAutoRefreshPlayerRealSeasonStats(input);
+  if (autoRefresh.autoRefreshed) {
+    await persistLiveDashboardInputDuringRender(autoRefresh.input);
+  }
+  const liveInput = autoRefresh.input;
+  const contractHydratedRoster = await hydratePhoPlayerContracts(liveInput.roster, undefined, {
+    fetchMissing: false,
+  });
+  const contractHydratedLeagueTargets = await hydratePhoPlayerContracts(liveInput.leagueTargets, undefined, {
+    fetchMissing: false,
+  });
+  const hydratedRoster = await hydratePhoPlayerSimulationStats(contractHydratedRoster);
+  const hydratedLeagueTargets = await hydratePhoPlayerSimulationStats(contractHydratedLeagueTargets);
+  const hydratedDraftPicks = liveInput.draftPicks;
+  const resolvedInput =
+    hydratedRoster === liveInput.roster &&
+    hydratedLeagueTargets === liveInput.leagueTargets &&
+    hydratedDraftPicks === liveInput.draftPicks
+      ? liveInput
+      : {
+          ...liveInput,
+          roster: hydratedRoster,
+          leagueTargets: hydratedLeagueTargets,
+          draftPicks: applyDraftOrdersToPicks(hydratedDraftPicks, liveInput.draftOrders),
+        };
+
+  const resolved: ResolvedDashboardInput = {
+    input: resolvedInput,
+    source: {
+      configuredMode,
+      resolvedMode: "live-file",
+      fallback: false,
+      liveFilePath,
+    },
+  };
+
+  // The auto-refresh may have rewritten the live file. Re-stat so the cache key
+  // matches the on-disk file going forward.
+  const finalStats = autoRefresh.autoRefreshed ? await stat(liveFilePath).catch(() => fileStats) : fileStats;
+  const finalStatsMtimeMs = await stat(getNhlPlayerStatsCachePath())
+    .then((value) => value.mtimeMs)
+    .catch(() => statsMtimeMs);
+
+  resolvedDashboardInputCache = {
+    filePath: liveFilePath,
+    mtimeMs: finalStats.mtimeMs,
+    size: finalStats.size,
+    statsMtimeMs: finalStatsMtimeMs,
+    expiresAt: Date.now() + RESOLVED_INPUT_CACHE_TTL_MS,
+    resolved,
+  };
+
+  const durationMs = Date.now() - startedAt;
+  if (durationMs >= SLOW_DASHBOARD_RESOLVE_THRESHOLD_MS) {
+    logDashboardActivity("resolve:slow", {
+      durationMs,
+      filePath: liveFilePath,
+      size: finalStats.size,
+      autoRefreshed: autoRefresh.autoRefreshed,
+    });
+  }
+
+  return resolved;
+};
+
 export const loadDashboardInput = async (): Promise<ResolvedDashboardInput> => {
   const configuredMode = getConfiguredSourceMode();
 
@@ -224,51 +450,35 @@ export const loadDashboardInput = async (): Promise<ResolvedDashboardInput> => {
 
   const liveFilePath = getConfiguredLiveFilePath();
 
-  try {
-    const input = await readLiveDashboardInput(liveFilePath);
-    const contractHydratedRoster = await hydratePhoPlayerContracts(input.roster, undefined, {
-      fetchMissing: false,
-    });
-    const contractHydratedLeagueTargets = await hydratePhoPlayerContracts(input.leagueTargets, undefined, {
-      fetchMissing: false,
-    });
-    const hydratedRoster = await hydratePhoPlayerSimulationStats(contractHydratedRoster);
-    const hydratedLeagueTargets = await hydratePhoPlayerSimulationStats(contractHydratedLeagueTargets);
-    const hydratedDraftPicks = input.draftPicks;
-    const resolvedInput = hydratedRoster === input.roster && hydratedLeagueTargets === input.leagueTargets && hydratedDraftPicks === input.draftPicks
-      ? input
-      : {
-          ...input,
-          roster: hydratedRoster,
-          leagueTargets: hydratedLeagueTargets,
-          draftPicks: applyDraftOrdersToPicks(hydratedDraftPicks, input.draftOrders),
-        };
-
-    return {
-      input: resolvedInput,
-      source: {
-        configuredMode,
-        resolvedMode: "live-file",
-        fallback: false,
-        liveFilePath,
-      },
-    };
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : "Unknown live data loading failure.";
-    logDashboardFailure("live-load:fallback", error, {
-      configuredMode,
-      liveFilePath,
-    });
-
-    return {
-      input: demoDashboardInput,
-      source: getDemoSourceInfo(
-        configuredMode,
-        `${detail} Falling back to demo data. Create ${liveFilePath} or set NHL_SIM_LIVE_DATA_PATH.`,
-        liveFilePath,
-      ),
-    };
+  if (pendingResolvedDashboardInput) {
+    return pendingResolvedDashboardInput;
   }
+
+  const pending = (async () => {
+    try {
+      return await resolveLiveDashboardInput(configuredMode, liveFilePath);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : "Unknown live data loading failure.";
+      logDashboardFailure("live-load:fallback", error, {
+        configuredMode,
+        liveFilePath,
+      });
+
+      return {
+        input: demoDashboardInput,
+        source: getDemoSourceInfo(
+          configuredMode,
+          `${detail} Falling back to demo data. Create ${liveFilePath} or set NHL_SIM_LIVE_DATA_PATH.`,
+          liveFilePath,
+        ),
+      } satisfies ResolvedDashboardInput;
+    }
+  })().finally(() => {
+    pendingResolvedDashboardInput = null;
+  });
+
+  pendingResolvedDashboardInput = pending;
+  return pending;
 };
 
 export const loadDashboardSnapshot = async (): Promise<{
@@ -304,30 +514,54 @@ export const parseDashboardInput = (value: unknown): NormalizedDashboardInput =>
   };
 };
 
-export const persistLiveDashboardInput = async (value: unknown) => {
-  const input = parseDashboardInput(value);
+const writeLiveDashboardInput = async (
+  input: NormalizedDashboardInput,
+  options?: {
+    revalidate?: boolean;
+  },
+) => {
   const liveFilePath = getConfiguredLiveFilePath();
   const serializedInput = `${JSON.stringify(input, null, 2)}\n`;
 
   await mkdir(path.dirname(liveFilePath), { recursive: true });
   await writeFile(liveFilePath, serializedInput, "utf8");
 
+  const writtenStats = await stat(liveFilePath).catch(() => null);
+  const mtimeMs = writtenStats?.mtimeMs ?? Date.now();
+  const size = writtenStats?.size ?? Buffer.byteLength(serializedInput, "utf8");
+
   liveDashboardInputCache = {
     filePath: liveFilePath,
     input,
-    mtimeMs: Date.now(),
-    size: Buffer.byteLength(serializedInput, "utf8"),
+    mtimeMs,
+    size,
     expiresAt: Date.now() + LIVE_DASHBOARD_CACHE_TTL_MS,
   };
 
-  revalidateTag("dashboard-input", "max");
-  revalidatePath("/");
+  // Drop the resolved cache so the next load re-runs hydration against the new
+  // file contents. The hydration result depends on the live-file payload itself.
+  resolvedDashboardInputCache = null;
+
+  if (options?.revalidate ?? true) {
+    revalidateTag("dashboard-input", "max");
+    revalidatePath("/");
+  }
 
   return {
     input,
     liveFilePath,
     configuredMode: getConfiguredSourceMode(),
   };
+};
+
+export const persistLiveDashboardInput = async (value: unknown) => {
+  const input = parseDashboardInput(value);
+  return writeLiveDashboardInput(input, { revalidate: true });
+};
+
+export const persistLiveDashboardInputDuringRender = async (value: unknown) => {
+  const input = parseDashboardInput(value);
+  return writeLiveDashboardInput(input, { revalidate: false });
 };
 
 export const updateLiveDashboardDraftPicks = async (updates: DraftPickOrderUpdate[]) => {

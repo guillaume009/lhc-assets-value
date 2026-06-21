@@ -1,7 +1,7 @@
 import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 
-import type { DraftPick, Player, Position } from "@/lib/domain";
+import type { ContractStatus, DraftPick, Player, Position } from "@/lib/domain";
 import { scorePick, scorePlayer, type TradeValueSignals } from "@/lib/valuation";
 
 const DEFAULT_TRADES_API_URL = "https://playhockeyonline.com/api/trades";
@@ -112,6 +112,13 @@ export type TradeAssetSummary = {
   score: number | null;
   playerId?: string;
   pickId?: string;
+  position?: Position;
+  role?: string;
+  age?: number;
+  contractStatus?: ContractStatus;
+  issuerTeam?: string;
+  season?: number;
+  round?: number;
 };
 
 export type TradeSideSummary = {
@@ -144,6 +151,21 @@ type TradeImportResult = {
   tradeCount: number;
 };
 
+export type TradeHistoryCacheStatus = {
+  filePath: string;
+  ttlMs: number;
+  cachedAt: string | null;
+  expiresAt: string | null;
+  remainingMs: number | null;
+  mtimeMs: number | null;
+  size: number | null;
+  lastLoadFailure: {
+    message: string;
+    occurredAt: string;
+    filePath: string;
+  } | null;
+};
+
 export const getPhoTradeImportConfig = () => ({
   apiUrl: getTradesApiUrl(),
   rawFilePath: getTradesCachePath(),
@@ -162,6 +184,8 @@ let tradeHistoryCache:
       data: TradeHistoryData;
     }
   | null = null;
+let lastTradeHistoryLoadFailure: TradeHistoryCacheStatus["lastLoadFailure"] = null;
+let pendingTradeHistory: Promise<TradeHistoryData> | null = null;
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -182,6 +206,36 @@ const getTradesApiUrl = () => process.env.PHO_TRADES_API_URL?.trim() || DEFAULT_
 
 const getTradesCachePath = () =>
   process.env.PHO_TRADES_RAW_PATH?.trim() || DEFAULT_TRADES_CACHE_PATH;
+
+export const getTradeHistoryCacheStatus = (): TradeHistoryCacheStatus => {
+  const cachedTradeHistory = tradeHistoryCache;
+
+  if (!cachedTradeHistory) {
+    return {
+      filePath: getTradesCachePath(),
+      ttlMs: TRADE_HISTORY_CACHE_TTL_MS,
+      cachedAt: null,
+      expiresAt: null,
+      remainingMs: null,
+      mtimeMs: null,
+      size: null,
+      lastLoadFailure: lastTradeHistoryLoadFailure,
+    };
+  }
+
+  const cachedAtMs = cachedTradeHistory.expiresAt - TRADE_HISTORY_CACHE_TTL_MS;
+
+  return {
+    filePath: cachedTradeHistory.filePath,
+    ttlMs: TRADE_HISTORY_CACHE_TTL_MS,
+    cachedAt: new Date(cachedAtMs).toISOString(),
+    expiresAt: new Date(cachedTradeHistory.expiresAt).toISOString(),
+    remainingMs: Math.max(cachedTradeHistory.expiresAt - Date.now(), 0),
+    mtimeMs: cachedTradeHistory.mtimeMs,
+    size: cachedTradeHistory.size,
+    lastLoadFailure: lastTradeHistoryLoadFailure,
+  };
+};
 
 const getAuthorizationVariants = () => {
   const configuredToken = process.env.PHO_AUTH_BEARER_TOKEN?.trim();
@@ -384,6 +438,10 @@ const buildTradeAssetSummary = (detail: PhoTradeDetail, sideTeamName: string): T
       type: "player",
       score: scorePlayer(normalizedPlayer),
       playerId: normalizedPlayer.id,
+      position: normalizedPlayer.position,
+      role: normalizedPlayer.role,
+      age: normalizedPlayer.age,
+      contractStatus: normalizedPlayer.contractStatus,
     };
   }
 
@@ -398,6 +456,9 @@ const buildTradeAssetSummary = (detail: PhoTradeDetail, sideTeamName: string): T
       type: "draft_pick",
       score: scorePick(normalizedPick),
       pickId: normalizedPick.id,
+      issuerTeam,
+      season: detail.draft_pick.year,
+      round: detail.draft_pick.round,
     };
   }
 
@@ -576,6 +637,7 @@ export const refreshPhoTradeCache = async (): Promise<TradeImportResult> => {
       });
 
       tradeHistoryCache = null;
+      lastTradeHistoryLoadFailure = null;
 
       return {
         authVariant: variant.label,
@@ -596,6 +658,19 @@ export const refreshPhoTradeCache = async (): Promise<TradeImportResult> => {
 };
 
 export const loadTradeHistory = async (): Promise<TradeHistoryData> => {
+  if (pendingTradeHistory) {
+    return pendingTradeHistory;
+  }
+
+  const pending = loadTradeHistoryUncached().finally(() => {
+    pendingTradeHistory = null;
+  });
+
+  pendingTradeHistory = pending;
+  return pending;
+};
+
+const loadTradeHistoryUncached = async (): Promise<TradeHistoryData> => {
   const filePath = getTradesCachePath();
   const startedAt = Date.now();
 
@@ -634,6 +709,7 @@ export const loadTradeHistory = async (): Promise<TradeHistoryData> => {
       expiresAt: Date.now() + TRADE_HISTORY_CACHE_TTL_MS,
       data,
     };
+    lastTradeHistoryLoadFailure = null;
 
     const durationMs = Date.now() - startedAt;
 
@@ -652,6 +728,11 @@ export const loadTradeHistory = async (): Promise<TradeHistoryData> => {
       durationMs: Date.now() - startedAt,
       filePath,
     });
+    lastTradeHistoryLoadFailure = {
+      message: error instanceof Error ? error.message : "Unknown trade-history load failure.",
+      occurredAt: new Date().toISOString(),
+      filePath,
+    };
 
     return {
       trades: [],

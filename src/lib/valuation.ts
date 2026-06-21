@@ -1,5 +1,7 @@
 import type { DraftPick, NormalizedDashboardInput, Player, Position } from "@/lib/domain";
 import { applyDraftOrdersToPicks } from "@/lib/draft-pick-order";
+import { getRealUpsideProfile } from "@/lib/real-upside";
+import { summarizePayroll, type PayrollSummary } from "@/lib/salary-cap";
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(Math.max(value, min), max);
@@ -53,6 +55,7 @@ export type DashboardSnapshot = {
   team: TeamAssessment;
   targets: TradeTarget[];
   picks: PickScore[];
+  payroll: PayrollSummary;
 };
 
 const ageScore = (player: Player) => {
@@ -98,18 +101,36 @@ const blendTradeSignal = (baseScore: number, signal: number | undefined) => {
   return Math.round(clamp(baseScore * baseWeight + (signal ?? 0) * tradeSignalWeight, 0, 100));
 };
 
+const blendRealSeasonSignal = (baseScore: number, player: Player) => {
+  const seasonStats = player.realSeasonStats;
+
+  if (!seasonStats || !Number.isFinite(seasonStats.valueSignal) || seasonStats.gamesPlayed <= 0) {
+    return baseScore;
+  }
+
+  const sampleWeight = clamp(seasonStats.gamesPlayed / (player.position === "G" ? 20 : 30), 0, 1);
+  const realSeasonWeight = 0.18 * sampleWeight;
+  const baseWeight = 1 - realSeasonWeight;
+
+  return Math.round(clamp(baseScore * baseWeight + seasonStats.valueSignal * realSeasonWeight, 0, 100));
+};
+
 export const scorePlayer = (player: Player, tradeValueSignals?: TradeValueSignals) => {
+  const realUpsideProfile = getRealUpsideProfile(player);
+  const adjustedUpside = realUpsideProfile?.adjustedUpside ?? player.upside;
   const score =
     player.performance * 0.29 +
     player.playDriving * 0.16 +
     player.defense * 0.14 +
     player.specialTeams * 0.08 +
     player.chemistryFit * 0.12 +
-    player.upside * 0.11 +
+    adjustedUpside * 0.11 +
     ageScore(player) * 0.06 +
     capEfficiency(player) * 0.04;
 
-  return blendTradeSignal(Math.round(clamp(score, 0, 100)), tradeValueSignals?.playerHistoricalScores[player.id]);
+  const seasonAdjustedScore = blendRealSeasonSignal(Math.round(clamp(score, 0, 100)), player);
+
+  return blendTradeSignal(seasonAdjustedScore, tradeValueSignals?.playerHistoricalScores[player.id]);
 };
 
 export const marketLabel = (score: number) => {
@@ -249,13 +270,23 @@ export const findTargets = (roster: Player[], targets: Player[], tradeValueSigna
     .slice(0, 3);
 };
 
-export const getDashboardSnapshot = ({
-  teamName,
-  roster,
-  leagueTargets,
-  draftPicks,
-  draftOrders,
-}: NormalizedDashboardInput, tradeValueSignals?: TradeValueSignals): DashboardSnapshot => {
+let dashboardSnapshotCache:
+  | { input: NormalizedDashboardInput; tradeValueSignals: TradeValueSignals | undefined; result: DashboardSnapshot }
+  | null = null;
+
+export const getDashboardSnapshot = (
+  input: NormalizedDashboardInput,
+  tradeValueSignals?: TradeValueSignals,
+): DashboardSnapshot => {
+  if (
+    dashboardSnapshotCache &&
+    dashboardSnapshotCache.input === input &&
+    dashboardSnapshotCache.tradeValueSignals === tradeValueSignals
+  ) {
+    return dashboardSnapshotCache.result;
+  }
+
+  const { teamName, roster, leagueTargets, draftPicks, draftOrders, finances } = input;
   const rosterScores = roster.map((player) => {
     const score = scorePlayer(player, tradeValueSignals);
 
@@ -274,11 +305,18 @@ export const getDashboardSnapshot = ({
 
   const team = assessTeam(roster, tradeValueSignals);
 
-  return {
+  const result: DashboardSnapshot = {
     teamName,
     rosterScores,
     team,
     targets: findTargets(roster, leagueTargets, tradeValueSignals),
     picks,
+    payroll: summarizePayroll(roster, {
+      contractPenalties: finances?.contractPenalties,
+      injuredRelief: finances?.injuredRelief,
+    }),
   };
+
+  dashboardSnapshotCache = { input, tradeValueSignals, result };
+  return result;
 };

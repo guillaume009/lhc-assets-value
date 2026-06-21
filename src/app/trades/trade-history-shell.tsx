@@ -1,3 +1,7 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 import { StandalonePageHeader } from "@/app/standalone-page-header";
 import type { SourceHoverSummary } from "@/app/source-hover-label";
 import { TradeHistoryList } from "@/app/trade-history-list";
@@ -16,6 +20,38 @@ type TradeHistoryShellProps = {
 const formatTradeSignalWeight = (value: number) => `${Math.round(value * 100)}%`;
 
 export function TradeHistoryShell({ source, sourceSummary, trades, tradeSignalWeight }: TradeHistoryShellProps) {
+  const [searchValue, setSearchValue] = useState("");
+  const normalizedSearchValue = searchValue.trim().toLowerCase();
+  const filteredTrades = useMemo(() => {
+    if (!normalizedSearchValue) {
+      return trades;
+    }
+
+    return trades.filter((trade) => {
+      const searchableFields = [
+        String(trade.id),
+        trade.createdAt,
+        trade.updatedAt,
+        trade.approvedAt ?? "",
+        ...trade.teams,
+        ...trade.sides.flatMap((side) => [
+          side.teamName,
+          side.comments,
+          ...side.assets.flatMap((asset) => [
+            asset.label,
+            asset.description ?? "",
+            asset.type,
+            asset.issuerTeam ?? "",
+            asset.role ?? "",
+            asset.position ?? "",
+          ]),
+        ]),
+      ];
+
+      return searchableFields.some((field) => field.toLowerCase().includes(normalizedSearchValue));
+    });
+  }, [normalizedSearchValue, trades]);
+
   return (
     <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
       <main className="mx-auto flex w-full max-w-[96rem] flex-col gap-5">
@@ -54,11 +90,32 @@ export function TradeHistoryShell({ source, sourceSummary, trades, tradeSignalWe
             </div>
             <TradeRefreshButton />
           </div>
+          <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <label className="text-sm text-slate-700">
+              <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-slate-500">Search trades</span>
+              <input
+                className="w-full rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-slate-900"
+                onChange={(event) => setSearchValue(event.target.value)}
+                placeholder="Search by team, player, pick, comment, or trade ID"
+                type="search"
+                value={searchValue}
+              />
+            </label>
+            <div className="rounded-[1.25rem] border border-[var(--line)] bg-white/85 px-4 py-3 text-right">
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Matching trades</p>
+              <p className="mt-2 text-2xl font-semibold text-slate-900">{filteredTrades.length}</p>
+            </div>
+          </div>
           <div className="mt-5">
             <TradeHistoryList
-              emptyMessage="No approved PHO trades are available in the current trade cache yet."
+              emptyMessage={
+                normalizedSearchValue
+                  ? "No trades matched the current search."
+                  : "No approved PHO trades are available in the current trade cache yet."
+              }
               limit={100}
-              trades={trades}
+              searchQuery={searchValue}
+              trades={filteredTrades}
             />
           </div>
         </section>

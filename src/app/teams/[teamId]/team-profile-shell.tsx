@@ -43,7 +43,13 @@ export function TeamProfileShell({ team, players, picks, source, sourceSummary, 
   );
   const highestUpsidePlayer = useMemo(
     () =>
-      [...players].sort((left, right) => right.upside - left.upside || right.score - left.score || left.name.localeCompare(right.name))[0] ?? null,
+      [...players].sort(
+        (left, right) =>
+          right.adjustedUpside - left.adjustedUpside ||
+          (right.realUpsideProfile?.adjustment ?? 0) - (left.realUpsideProfile?.adjustment ?? 0) ||
+          right.score - left.score ||
+          left.name.localeCompare(right.name),
+      )[0] ?? null,
     [players],
   );
   const averageCapHit =
@@ -266,10 +272,11 @@ export function TeamProfileShell({ team, players, picks, source, sourceSummary, 
               <div className="mt-5 space-y-4">
                 <div className="rounded-[1.5rem] border border-[var(--line)] bg-[linear-gradient(135deg,rgba(37,99,235,0.12),rgba(225,29,72,0.1))] p-5 shadow-[0_18px_40px_rgba(37,99,235,0.08)]">
                   <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent-strong)]">Highest upside</p>
+                  <p className="text-xs uppercase tracking-[0.18em] text-[var(--accent-strong)]">Highest IRL upside</p>
                   <p className="mt-3 text-2xl font-semibold text-slate-900">{highestUpsidePlayer?.name ?? "No tracked player"}</p>
                   <p className="mt-2 text-sm text-slate-700">
                     {highestUpsidePlayer
-                      ? `${highestUpsidePlayer.position} / upside ${highestUpsidePlayer.upside} / score ${highestUpsidePlayer.score}`
+                      ? `${highestUpsidePlayer.position} / adjusted upside ${highestUpsidePlayer.adjustedUpside} / ${highestUpsidePlayer.realUpsideProfile?.adjustment ? `${highestUpsidePlayer.realUpsideProfile.adjustment > 0 ? "+" : ""}${highestUpsidePlayer.realUpsideProfile.adjustment} IRL` : "flat IRL"}`
                       : "This appears when roster data is available."}
                   </p>
                 </div>

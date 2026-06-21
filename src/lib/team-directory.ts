@@ -46,11 +46,29 @@ export const getTeamPicks = (input: NormalizedDashboardInput, teamName: string, 
     }))
     .sort((left, right) => left.season - right.season || left.round - right.round || left.projectedSlot - right.projectedSlot);
 
+let teamDirectoryEntriesCache:
+  | {
+      input: NormalizedDashboardInput;
+      players: DirectoryPlayer[];
+      tradeValueSignals: TradeValueSignals | undefined;
+      result: DirectoryTeam[];
+    }
+  | null = null;
+
 export const getTeamDirectoryEntries = (
   input: NormalizedDashboardInput,
   players: DirectoryPlayer[],
   tradeValueSignals?: TradeValueSignals,
 ): DirectoryTeam[] => {
+  if (
+    teamDirectoryEntriesCache &&
+    teamDirectoryEntriesCache.input === input &&
+    teamDirectoryEntriesCache.players === players &&
+    teamDirectoryEntriesCache.tradeValueSignals === tradeValueSignals
+  ) {
+    return teamDirectoryEntriesCache.result;
+  }
+
   const currentSeason = new Date().getFullYear();
   const teamNames = [...new Set([
     input.teamName,
@@ -60,7 +78,7 @@ export const getTeamDirectoryEntries = (
     ...input.draftOrders.map((order) => order.team),
   ])].sort((left, right) => left.localeCompare(right));
 
-  return teamNames
+  const result = teamNames
     .map((teamName) => {
       const teamPlayers = getTeamPlayers(players, teamName);
       const teamPicks = getTeamPicks(input, teamName, tradeValueSignals);
@@ -90,6 +108,9 @@ export const getTeamDirectoryEntries = (
         right.totalPickValue - left.totalPickValue ||
         left.name.localeCompare(right.name),
     );
+
+  teamDirectoryEntriesCache = { input, players, tradeValueSignals, result };
+  return result;
 };
 
 export const getDirectoryTeam = (teams: DirectoryTeam[], teamId: string) => {

@@ -115,6 +115,7 @@ export const myRoster: Player[] = [
     capHit: 0.95,
     yearsRemaining: 3,
     contractStatus: "prospect",
+    inMinors: true,
     performance: 54,
     playDriving: 63,
     defense: 61,
@@ -132,6 +133,7 @@ export const myRoster: Player[] = [
     capHit: 0.9,
     yearsRemaining: 3,
     contractStatus: "prospect",
+    inMinors: true,
     performance: 48,
     playDriving: 59,
     defense: 44,
@@ -283,4 +285,8 @@ export const demoDashboardInput: NormalizedDashboardInput = {
   leagueTargets,
   draftPicks,
   draftOrders,
+  finances: {
+    contractPenalties: 1.2,
+    injuredRelief: 0,
+  },
 };

@@ -23,5 +23,5 @@ export default async function TradeWorkbenchPage() {
     draftOrderCount: input.draftOrders.length,
   };
 
-  return <TradeWorkbenchShell source={source} sourceSummary={sourceSummary} teams={teams} />;
+  return <TradeWorkbenchShell source={source} sourceSummary={sourceSummary} teams={teams} trades={tradeHistory.trades} />;
 }

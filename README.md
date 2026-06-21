@@ -174,11 +174,11 @@ This route will:
 
 - fetch every page from the PHO player API
 - fetch team metadata from the PHO teams API so `team_id` values map to real team names
-- fetch PHO draft picks and keep the picks owned by your current team
+- fetch PHO draft picks for every team in the league
 - keep the raw combined payload in `data/playhockeyonline-players.raw.json`
 - map the PHO stats bag into the existing dashboard `Player` model
 - use `belongs_to_current_team` to split your roster from the league pool
-- map owned draft picks into the dashboard `DraftPick` model using a neutral slot fallback when PHO does not expose pick rank
+- map league-wide draft picks into the dashboard `DraftPick` model using a neutral slot fallback when PHO does not expose pick rank
 - write the normalized result to the live dashboard cache file
 
 ### PowerShell example
@@ -187,7 +187,7 @@ This route will:
 Invoke-RestMethod -Method Post -Uri http://localhost:3000/api/import/playhockeyonline/dashboard
 ```
 
-This is a first-pass mapping. Team names for non-roster players now come from the PHO teams API, and owned draft picks now come from the PHO draft-picks API. Your own roster label still uses `PHO_CURRENT_TEAM_NAME` so you can override it locally. Because the PHO draft-picks response does not populate `rank`, projected slot currently falls back to a neutral round midpoint.
+This is a first-pass mapping. Team names for non-roster players now come from the PHO teams API, and league-wide draft picks now come from the PHO draft-picks API. Your own roster label still uses `PHO_CURRENT_TEAM_NAME` so you can override it locally, and imported picks for your club keep that same label so roster and pick ownership stay aligned. Because the PHO draft-picks response does not populate `rank`, projected slot currently falls back to a neutral round midpoint.
 
 ## Trade history scoring weight
 
@@ -229,6 +229,53 @@ This route will:
 - fall back to the existing cached trade file if PHO responds with `Too Many Attempts` or `429`
 
 The `/trades` page now includes a manual refresh button that calls this route and shows whether the refresh succeeded, fell back to cached data, or failed.
+
+## NHL real-season stat refresh
+
+Northstar GM can now pull current NHL regular-season stats, cache them locally once per day, and blend that signal into player value.
+
+### Inspect the NHL stat refresher config
+
+```text
+GET /api/import/nhl/player-stats
+```
+
+This returns the cache path, the daily refresh interval, and the current data-source mode.
+
+### Refresh current-season NHL stats into the live dashboard
+
+```text
+POST /api/import/nhl/player-stats
+```
+
+This route will:
+
+- load the current live dashboard file
+- resolve NHL players by name against the public NHL search API
+- fetch each matched player's current-season NHL landing stats
+- cache those lookups in `data/nhl-player-stats.json` by default
+- persist the stat signal back onto live dashboard players
+- revalidate the dashboard, players, teams, trades, and workbench pages
+
+When `NHL_SIM_DATA_SOURCE=live-file`, the app also performs this refresh automatically on the first live-data load of a new UTC day. That means the first request after the date rolls over will update the cached NHL stat signal before the rest of the app reads player value.
+
+By default, players already refreshed within the last 24 hours are skipped. To force a full refresh:
+
+```text
+POST /api/import/nhl/player-stats?force=true
+```
+
+Optional `.env.local` settings:
+
+```env
+# defaults to data/nhl-player-stats.json
+# NHL_SIM_NHL_PLAYER_STATS_PATH=C:\absolute\path\to\nhl-player-stats.json
+
+# defaults to 24 hours
+# NHL_SIM_REAL_STATS_REFRESH_HOURS=24
+```
+
+This route is intentionally explicit. To run it once a day in production, point your scheduler of choice at it.
 
 ## Validation
 

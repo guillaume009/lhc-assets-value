@@ -1,0 +1,885 @@
+ 
+ 
+ 
+  
+RÈGLEMENTS 2025-2026 
+En ligne depuis 2002 
+https://app.playhockeyonline.com/ 
+2 | P a g e  
+ 
+Sommaire 
+1. La simulation ........................................................................................................................... 5 
+1.1 Règles Générales ............................................................................................................ 5 
+1.2 Client STHS ..................................................................................................................... 5 
+1.3 Exécutif de la LHC ........................................................................................................... 5 
+2. Lexique .................................................................................................................................... 6 
+2.1. Abréviations pour les joueurs ........................................................................................ 6 
+3. Composition des équipes ........................................................................................................ 8 
+3.1. Nombre de joueurs ........................................................................................................ 8 
+3.2. Exigence de compétitivité .............................................................................................. 8 
+3.3. Plafond et plancher des salaires .................................................................................... 9 
+3.2.1 Impact salariale des joueurs ...................................................................................... 9 
+3.3 Plafond des dépenses .................................................................................................... 9 
+3.3 Amendes ........................................................................................................................ 9 
+4. Joueurs et spécifications ....................................................................................................... 10 
+4.1 Date limite pour faire graduer un prospect ................................................................. 10 
+4.2 Recrues et contrat d’entrée ......................................................................................... 11 
+4.3 Utilisation des gardiens de but .................................................................................... 12 
+4.4 Ajouter un joueur ......................................................................................................... 12 
+4.5 Position des joueurs ..................................................................................................... 13 
+5. Les contrats ........................................................................................................................... 14 
+5.1 Définitions des contrats ............................................................................................... 14 
+5.2 Prolonger le contrat d’un joueur ................................................................................. 14 
+5.3 Restrictions pour les prolongations de contrat pour les joueurs de 26 ans et moins . 14 
+5.4 Comment prolonger un contrat ................................................................................... 15 
+5.4.1 Les critères considérés par l’intelligence artificielle ................................................ 15 
+5.4.2 Comportement de l’agent pour les prolongations de contrats des agents libres 
+AVEC restriction ..................................................................................................................... 15 
+5.5 Arbitrage salarial .......................................................................................................... 16 
+5.5.1 Fonctionnement de l’arbitrage ................................................................................ 16 
+3 | P a g e  
+ 
+5.5.2 Lignes directrices de l’arbitre .................................................................................. 16 
+5.4 Libérer un joueur (rachat de contrat) .......................................................................... 17 
+5.4.1 Impact du rachat ...................................................................................................... 17 
+5.4.2 Restrictions .............................................................................................................. 17 
+5.4.3 Périodes où le rachat est impossible ....................................................................... 17 
+5.5 Libérations (rachats) sans pénalités ............................................................................. 18 
+5.5.1 Joueurs retraités de la LNH ...................................................................................... 18 
+5.4.1 Joueurs en Europe ................................................................................................... 18 
+5.4.1 Décès d’un joueur .................................................................................................... 18 
+6. Valse des joueurs autonomes ............................................................................................... 19 
+6.1 Règles générales .......................................................................................................... 19 
+6.2 Procédures des signatures ........................................................................................... 19 
+6.2.1 Offre salarial minimum et maximum ....................................................................... 19 
+7. Le repêchage ......................................................................................................................... 20 
+7.1 Règles générales .......................................................................................................... 20 
+7.1 Ordre de sélection et loterie ........................................................................................ 20 
+8. Les transactions ..................................................................................................................... 22 
+8.1 Règles générales .......................................................................................................... 22 
+8.2 Ce qui peut être échangé ............................................................................................. 22 
+8.2.1 Salaires retenus ....................................................................................................... 22 
+8.3 Comité d’évaluation des transactions ......................................................................... 23 
+8.3.1 Rôle et Critères d’évaluations .................................................................................. 23 
+8.3.2 Délibération du comité ............................................................................................ 24 
+8.3.3 Membres du comité ................................................................................................ 24 
+8.3.4 Substituts du comité ................................................................................................ 24 
+8.4 Date limite des transactions ........................................................................................ 24 
+8.5 Parrainage des nouveaux DGs ..................................................................................... 24 
+9. Renvois aux mineures ............................................................................................................ 25 
+9.1 Règles générales .......................................................................................................... 25 
+9.2 Restrictions .................................................................................................................. 25 
+9.3 Exclusions ..................................................................................................................... 25 
+10. Sanctions .......................................................................................................................... 26 
+4 | P a g e  
+ 
+11.1 Amendes en lien avec les effectifs ............................................................................... 26 
+11.2 Diverses amendes ........................................................................................................ 26 
+11. Mauvais comportement ................................................................................................... 27 
+12.1 Règle générale .............................................................................................................. 27 
+12.2 Fairplay ......................................................................................................................... 27 
+12. Les mentions .................................................................................................................... 28 
+13.1 Trophées individuels .................................................................................................... 28 
+13. Les cotes ........................................................................................................................... 29 
+14.1 Comité des cotes .......................................................................................................... 29 
+14.2 Révision des cotes calculées ........................................................................................ 29 
+14. Dates importantes ............................................................................................................ 30 
+15.1 Calendrier type ............................................................................................................. 30 
+ 
+  
+5 | P a g e  
+ 
+1. La simulation 
+1.1 Règles Générales 
+En se joignant à la Ligue de Hockey du Canada (ci -après nommé LHC), chaque directeur -
+général a comme engagement de veillez à ce que ses alignements (rosters), trios et stratégies 
+soient faits dans les normes et besoins d’une équipe de la LNH. Chaque DG se doit de faire 
+parvenir ses alignements via le site web au plus tard une heure avant le début des simulations 
+auquel son équipe participe.  Étant donné qu’il y a une simulation chaque soir, chaque DG 
+à la responsabilité de veiller au bon déroulement de ce processus. 
+Tout défaut de se conformer à cette simple règle pourrait entraîner le remplacement 
+sans préavis du directeur -général fautif. Cette règle a pour but de faciliter le travail 
+de la personne chargé des simulations , car des alignements non -complets ont parfois 
+un impact considérable sur la durée des simulations d es parties.  En effet, l e responsable 
+des simulations ne devrait pas avoir à corriger des problèmes de simulation, à  chaque fois 
+que ce dernier veut simuler les parties du jour.  
+Une saison de la LHC comporte 82 parties de saison régulière en plus des séries éliminatoires 
+pour les équipes participantes.  Les séries éliminatoires sont des 4 de 7 pour chacune des 
+rondes. 
+Une simulation fait avancer le calendrier de 1 jour à la fois. 
+1.2 Client STHS 
+Afin de faire vos alignements, vous devez vous procurer le client STHS via le site de Simon  T 
+hockey simulator http://sths.simont.info/Download_Fra.php. 
+Un tutoriel pour apprendre comment l’utiliser est disponible sur YouTube au lien suivant  : 
+https://www.youtube.com/watch?v=llFz1gw-qDs. 
+Pour toutes questions supplémentaires concernant l’utilisation du portail ou du client  : 
+jonathanbeauchesne@gmail.com 
+1.3 Exécutif de la LHC 
+- Christian Laforce (Sénateurs d’Ottawa) 
+o Président 
+- Jonathan Beauchesne (Kings de Los Angeles) 
+o Responsable des simulations et des affaires courantes 
+- Vincent Dolan (Jets de Winnipeg) 
+o  Arbitre contractuel
+2. Lexique 
+Afin de permettre aux joueurs de la ligue de se démarquer sous plusieurs aspects, le STHS offre 
+un total de 17 cotes (15 pour les gardiens).  
+La section OV, qui exprime en moyenne les aptitudes d'un joueur, n’est d'aucune utilité sous le 
+système du STHS. 
+2.1. Abréviations pour les joueurs 
+PO = Position 
+CON = Condition 
+IJ = Blessure 
+CK = Mise En Échec  
+FG = Bataille  
+DI = Discipline  
+SK = Patinage  
+ST = Force  
+EN = Endurance 
+DU = Durabilité  
+PH = Précision  
+FO = Mise en Jeu  
+PA = Passe  
+SC = Tirs 
+DF = Défense  
+PS = Tirs de Pénalité 
+EX = Expérience  
+LD = Leadership 
+CK - Plus la cote est haute, plus de chances de donner des mises en échec.  
+FG - Plus la cote est haute, plus de chances de participer à des batailles. 
+DI - Plus la cote est haute, moins de pénalités il va prendre. 
+SK - Plus la cote est haute, plus le joueur a de chance de patiner, au lieu 
+d’effectuer une passe ou un tir. 
+ST - Plus la cote est haute, moins de mises en échec il va recevoir. Effet 
+limité dans les mises en jeu. 
+EN - Affecte toutes les cotes au début du match. Quand un joueur est 
+envoyé sur la glace fatiguée, cette cote est utilisée pour décider si toutes 
+les cotes pour cette présence seront plus basses que normale. Aussi utilisé 
+dans la fatigue post-match. 
+DU - Plus la cote est haute, moins il y a de chances de blessures. 
+PH - Plus la cote est haute, plus le joueur a de chances de réussir son tir ou 
+sa passe. 
+FO - Plus la cote est haute, plus de chances de gagner une mise en jeu. 
+PA - Plus la cote est haute, plus de chances d’effectuer une passe*. 
+SC - Plus la cote est haute, plus de chances d’effectuer un tir*. 
+DF - Plus la cote est haute, mieux il va jouer en défense / plus de chances 
+de bloquer des lancers / plus de chances de récupérer des rondelles libres. 
+Utilisé dans la prise de décision*. 
+PS - Plus la cote est haute, plus de chances de compter sur un tir de 
+pénalité. 
+EX - Plus la cote est haute, meilleur son moral et celui de l'équipe seront. 
+Effet limité dans les mises en jeu. 
+LD - Plus la cote est haute, meilleur son moral et celui de l'équipe seront. 
+Taille & Poids - Plus un joueur est lourd est et grand, plus de chances de 
+donner des mises en échec. 
+ 
+7 | P a g e  
+ 
+Abréviations pour les gardiens  
+SK = Patinage  
+DU = Durabilité  
+EN = Endurance 
+SZ = Grandeur  
+AG = Agilité  
+RB = Direction des Retours  
+SC = Contrôle du Style  
+HS = Vitesse de la Main  
+PC = Contrôle de Rondelle 
+RT = Temps de Réaction  
+PH = Contrôle de Rondelle  
+PS = Tirs de Pénalité 
+EX = Expérience  
+LD = Leadership  
+PO = Potentiel 
+SK - Plus la cote est haute, plus de chances d'arrêter un tir. 
+(Secondaire) 
+DU - Plus la cote est haute, moins il y a de chances de blessures. 
+EN - Utilisé dans la fatigue post-match. 
+SZ - Plus la cote est haute, plus de chances d'arrêter un tir. 
+(Secondaire) 
+AG - Plus la cote est haute, plus de chances d'arrêter un tir. 
+(Secondaire) 
+RB - Plus la cote est haute, moins il y a de chances de rebond. 
+SC - Plus la cote est haute, plus de chances d'arrêter un tir. (Principale) 
+HS - Plus la cote est haute, plus de chances d'arrêter un tir. (Principale) 
+RT - Plus la cote est haute, plus de chances d'arrêter un tir. (Principale) 
+PC - Plus la cote est haute, plus de chances d'intercepter la rondelle 
+quand elle est tirée dans le fond de la zone. 
+PS - Plus la cote est haute, plus de chances d'arrêter un tir de pénalité. 
+EX - Plus la cote est haute, meilleur son moral et le moral de l'équipe. 
+LS - Plus la cote est haute, meilleur son moral et le moral de l'équipe. 
+8 | P a g e  
+ 
+3. Composition des équipes 
+3.1. Nombre de joueurs 
+Chaque concession doit être composée d’un minimum de 43 joueurs et un maximum de 50 
+joueurs dans son effectif. 
+L’équipe professionnelle doit être composée, en tout temps, de 23-25 joueurs : 
+• 5 centres,  
+• 9 ailiers (dont minimum 4 ailiers gauches et 4 ailiers droits) 
+• 7 défenseurs 
+• 2 gardiens  
+Un alignement légal ne peut être composé que d’un maximum de 6 défenseurs à la fois. 
+L’équipe ferme doit être composée d’un alignement partant de 20 joueurs : 
+• 4 centres,  
+• 8 ailiers (dont minimum 4 ailiers gauches et 4 ailiers droits) 
+• 6 défenseurs 
+• 2 gardiens 
+Si ces règlements ne sont pas respectés , une sanction peut se voir être octroyée (voir 10 - 
+Sanctions). Ces règles ont pour but d'empêcher les trop nombreuses erreurs de simulation, 
+qui retardent le temps des simulations pour nos gentils bénévoles, et qui sont liés à un nombre 
+déficient de joueurs dans certaines positions, lors de blessures.   
+3.2. Exigence de compétitivité 
+Chaque concession se doit de monter une équipe compétitive, au minimum. Par conséquent, 
+afin d’éviter que les équipes vendent tous les joueurs compétitifs, sans aucune impunité, 
+les équipes doivent être composées d’au moins : 
+• 2 centres avec 65 de OV minimum 
+• 3 centres avec 60 de OV minimum 
+• 4 ailiers avec 65 de OV minimum 
+• 6 ailiers avec 60 de OV minimum 
+• 4 défenseurs avec 65 de OV minimum 
+• 4 défenseurs avec 60 de OV minimum 
+• 2 gardiens avec 70 de OV minimum  
+9 | P a g e  
+ 
+3.3. Plafond et plancher des salaires 
+Dans un souci d’équité, la ligue LHC possède un plafond et un plancher salarial, comme dans 
+la LNH. Ainsi, pour la saison 2025-2026, voici les paramètres : 
+• Plancher salarial : 70,600,000$ 
+• Plafond salarial : 95,500,000$ 
+3.2.1 Impact salariale des joueurs 
+o Lors de la saison régulière, le salaire des joueurs dans le club professionnel 
+compte pour 100% sur la masse salariale de leur équipe ; 
+o Les contrats des joueurs cédés au club école ont un impact différent : 
+▪ Les deux (2) premiers millions d’un contrat (valeur annuelle) 
+ont un impact de 10% sur la masse salariale ; 
+▪ L’excédent a un impact de 100% sur la masse salariale 
+▪ Par exemple : si un joueur gagne 3M$ par saison, son impact sur la masse 
+salariale sera de 1,2M$ dans le club école (10% x 2M$ + 1M$) 
+3.3 Plafond des dépenses 
+Dans un souci d’équité et pour faciliter le travail de l’administration, une limite de dépenses a été 
+instaurée. 
+• Plafond des dépenses = Plafond du cap salarial + 25% 
+o Tous les contrats professionnels ont un impact de 100% de la valeur du contrat 
+sur la masse salariale du plafond des dépenses ; 
+o Par exemple, lors de la saison 2023-2024, la limite des dépenses sera de 
+104,375,000$ (82,5M$ * 1,25) ; 
+Qu’est-ce que ça signifie? Cela signifie que toute offre qui ferait en sorte que le budget de l’équipe 
+dépasse le seuil établi via le calcul du plafond des dépenses sera dorénavant refusée.  
+Ce règlement a pour but d’empêcher les équipes d’intégrer trop de joueurs de bon calibre dans 
+le club école, afin de sauver une bonne portion de son salaire, et de plutôt le forcer à les échanger 
+ou à les rendre disponibles aux autres formations.  
+3.3 Amendes 
+Toute équipe fautive, c’est -à-dire, qui ne respecterait pas le plafond salarial  ou le plafond des 
+dépenses, se verra retirer son offre la plus onéreuse (salaire total  : années*salaires). Ce dernier 
+sera alors rendu disponible à l’ensemble des DGs, à l’exception du DG fautif. 
+4. Joueurs et spécifications 
+4.1 Date limite pour faire graduer un prospect 
+Lorsque vous repêchez un joueur, il sera automatiquement mis dans votre liste de prospects. 
+Si vous désirez offrir un contrat à un de vos prospects et le faire graduer dans votre équipe 
+professionnelle ou votre club ferme, il devient alors une recrue.  
+Les recrues qui graduent dans la LHC pour leur première saison se voient attribuer un contrat 
+correspondant à leur cote « OV ». 
+Toutefois, comme les rangs mineurs ne sont pas éternels, un joueur junior ne peut être protégé 
+sur la liste des prospects que jusqu’à l’âge de : 
+• Attaquants et défenseurs : 21 ans (inclusivement) 
+• Gardiens : 23 ans (inclusivement) 
+L’âge des recrues est déterminé au 1er octobre de chaque année. 
+À la saison de son 22 e anniversaire (ou 24 e pour les gardiens), le DG doit choisir entre libérer 
+le prospect, qui deviendra joueur autonome sans restriction, ou lui offrir un contrat selon 
+les modalités stipulées en 4.1.  
+Donc, si l’âge des joueurs, au 30 septembre de chaque année, dépasse le seuil limite, ces derniers 
+ne pourront être protégés sur la liste des prospects pour une saison supplémentaire.  
+Les joueurs qui ne seront pas signés chez les professionnels deviendront joueurs autonomes 
+sans compensation. 
+La date limite pour signer vos prospects dont l’âge limite a été atteint est le 14 août  23h59. 
+Soyez avisé que si  vous ne donnez aucune réponse, il sera considéré que vous ne désirez pas 
+signer ces prospects et ils seront donc placés dans la liste de joueurs autonomes sans restriction. 
+Pour activer vos prospects, vous devrez en aviser la personne chargée des simulations 
+(jonathanbeauchesne@gmail.com ) par courriel. Il vous faut également aviser, par courriel, 
+pour tous les prospects que vous ne signez pas, afin qu’ils soient retirés de votre liste de prospects 
+et mis disponibles dans la liste des joueurs autonomes sans compensations. 
+  
+11 | P a g e  
+ 
+4.2 Recrues et contrat d’entrée 
+La date limite pour faire signer un contrat professionnel à un prospect  (dont l’âge limite n’a pas 
+atteint le seuil limite),  et le faire jouer pour la  présente saison , est la 9e partie de la saison 
+régulière. Après cette date, les prospects ne pourront graduer avant la saison suivante. 
+Veuillez passer par le portail, afin d’activer vos prospects. 
+ 
+Figure 1 - Sur le profil du joueur, cliquez sur la case « Activer le prospect », afin de signaler votre intention 
+d'activer votre prospect 
+Joueurs 
+- 80 OV et plus : 40 000$ x (OV) 
+- 75 OV et 79 OV : 30 000$ x (OV) 
+- 70 OV et 74 OV : 20 000$ x (OV) 
+- 67 OV à 69 OV : 15 000$ x (OV) 
+- 66 OV et moins : salaire minimum 
+Gardiens 
+- 80 OV et plus : 40 000$ x (OV) 
+- 76 OV et 79 OV : 30 000$ x (OV) 
+- 71 OV et 75 OV : 20 000$ x (OV) 
+- 66 OV à 70 OV : 15 000$ x (OV) 
+- 65 OV et moins : salaire minimum 
+Les prospects qui n’ont encore jamais joué s dans la LNH ou la LAH n’auront malheureusement 
+aucune cote déjà créée. Il sera tout de même possible d’offrir un contrat d’entrée à ces joueurs 
+et ils se verront octroyés une cote OV. 
+Les recrues qui ont jouées 40 parties et plus dans la NHL doivent obligatoirement être signées. 
+• Ce règlement a pour but d'empêcher les clubs de cacher leurs meilleurs atouts 
+dans la banque de prospects protégés dans le but de «  tanker ». Cela a aussi pour but 
+d'empêcher les aberrations statistiques qui se sont créés cette saison. 
+Le nombre d’année s qui sera attribué au contrat du joueur recrue va dépendre de son âge , 
+au moment de sa graduation. 
+Nombre d’années : 
+- Entre 18 et 20 ans : 3 ans 
+- Entre 21 et 22 ans : 2 ans 
+- Entre 23 et 24 ans : 2 ans 
+
+12 | P a g e  
+ 
+4.3 Utilisation des gardiens de but 
+Les équipes devront restreindre l’utilisation de leurs gardiens de but pendant la saison régulière. 
+Les gardiens de but n’étant pas des super s héros, ils  ont besoin de repos occasionnel. Ainsi , 
+les équipes ne pourront faire jouer plus de 4080 minutes à n’importe lequel de leurs gardiens 
+de but. Ce nombre représente 68 parties complètes sans prolongation. 
+Il est important de noter que même si un gardien est échangé en cours de saison, il ne pourra être 
+utilisé plus de 4080 minutes. Les minutes accumulées avec son ancienne équipe seront cumulées 
+à celles de sa nouvelle équipe. 
+Toute équipe étant pris en défaut de ce règlement se verra octroyer une amende tel que stipulé 
+à la section des amendes (12.1). 
+À noter qu’aucune restriction ne s’applique au cours des séries éliminatoires. 
+4.4 Ajouter un joueur 
+Chaque année, un effort est fait afin d’inclure les joueurs de la ligue américaine (AHL), dans la base 
+de données du portail. Toutefois, il est possible de faire ajouter des joueurs qui ne sont pas dans 
+la base de données initiale. Ces joueurs peuvent être soit des joueurs en provenance d’une équipe 
+autre que la NHL, soit des joueurs qui n’ont pas été repêché par une équipe de la LNH et qui ont 
+signé des contrats avec une équipe de la LNH dans l’entre-saison à titre de joueur autonome sans 
+restriction. Lorsqu’une demande est faite, via courriel à l’administrateur de la ligue, le joueur sera 
+automatiquement signé pour l’équipe ayant fait la demande, au salaire minimum, pour une durée 
+de deux (2) ans. 
+Restrictions : 
+• Le joueur doit être âgé de 22 ans et plus 
+• Les demandes doivent être faites au moins 30 jours après le début de la saison régulière 
+• Lors de la première semaine d’éligibilité, si plusieurs demandes sont faites pour le même 
+joueur, une enchère à l’aveugle sera effectuée 
+o Les deux DGs devront donc faire une offre, et la plus haute l’emportera : 
+▪ Les offres devront être par tranche de 100,000$ 
+▪ Les offres seront quand même pour un contrat de deux ans 
+• Maximum 3 demandes par DG, par saison 
+o La date limite pour faire des ajouts de joueurs pour la saison courante est la date 
+où les activités cesseront pour la période des fêtes. Après , il faudra attendre 
+à la saison suivante. 
+  
+13 | P a g e  
+ 
+4.5 Position des joueurs 
+Tel que dans la ligue nationale de hockey, les joueurs de la LHC peuvent jouer à de multiples 
+positions. Ainsi, le même joueur peut jouer au centre, à l’aile gauche ou à l’aile droite. Plusieurs 
+de ces joueurs ont la multiple position déjà acquise lorsque nous recevons les cotes. Toutefois , 
+si un de vos joueurs n’est pas marqué à plusieurs positions et que vous voulez le faire jouer ainsi, 
+il vous faudra faire suivre un lien en le mentionnant à la personne chargée  des simulations 
+de la ligue ( jonathanbeauchesne@gmail.com) en incluant dans le message le nom du joueur, 
+la position que vous voulez faire ajouter et le lien prouvant votre demande. 
+Sites valides :  
+• CapWages.com 
+Vous devez nous aviser du changement de position de votre joueur dans les plus brefs délais, soit, 
+après la signature, ou encore, de l’acquisition via une transaction de celui-ci. Une fois la position 
+du joueur changée, on ne peut revenir en arrière. 
+À noter qu’un joueur peut jouer hors -position, mais celui -ci jouera avec des statistiques 
+amoindries, puisqu’il ne joue pas sa position naturelle. 
+5. Les contrats 
+5.1 Définitions des contrats 
+Le salaire minimum pour un joueur est de 775 000$ en 2025-2026. À la fin de chaque saison, 
+les joueurs dont le contrat vient à 0 deviennent automatiquement joueurs autonomes. 
+Les joueurs âgés de 28 ans ou plus deviennent joueurs autonomes SANS compensations. 
+Les joueurs âgés de 27 ans ou moins deviennent joueurs autonomes AVEC compensations. 
+Les contrats peuvent être prolongés en tout temps avant le 30 juin de chaque année. 
+La durée des contrats offerts varie selon l’âge du joueur. Voici le tableau en fonction de l’âge : 
+- Contrat maximal de 3 ans pour un joueur de 21 à 25 ans. 
+- Contrat maximal de 4 ans pour un joueur de 26 à 32 ans. 
+- Contrat maximal de 3 ans pour un joueur de 33 à 35 ans. 
+- Contrat maximal de 2 ans pour un joueur de 36 à 39 ans. 
+- Contrat maximal de 1 an pour un joueur de 40 ans et plus. 
+Les contrats à échelles décroissantes ne sont pas acceptés. 
+5.2 Prolonger le contrat d’un joueur 
+Les DG peuvent, en tout temps , au courant de l’année (du 1 er juillet au 30 juin) , renouveler 
+les contrats des joueurs de leur équipe. Deux conditions sont exigées : 
+- Que le joueur en soit à sa dernière année de contrat. 
+- Que le nombre d’années maximum stipulé en 5.1 soit respecté. 
+5.3 Restrictions pour les prolongations de contrat pour les joueurs de 26 ans et 
+moins 
+Les joueurs âgés de 26 ans et moins doivent dorénavant recevoir un contrat d’une durée minimale 
+de 2 ans.  
+Ce règlement a pour but d'enlever le pouvoir de « divination » des DGs, qui leur permet d'attendre 
+la fin de la saison pour savoir s'ils doivent signer un joueur d’un an, ou s'engager à long termes. 
+  
+15 | P a g e  
+ 
+5.4 Comment prolonger un contrat 
+Pour prolonger un contrat, il vous faudra passer par la page du joueur et cliquer sur le bouton  
+« Extension de contrat ». 
+5.4.1 Les critères considérés par l’intelligence artificielle 
+Les critères considérés par l’intelligence artificielle sont les suivants : 
+• Pour chaque point de pourcentage  (1%) de moins de signer un joueur, le salaire 
+demandé va diminuer de 0,25% 
+• Chaque fois qu’un joueur refuse une offre, il va bonifier le salaire demandé de 20%. 
+• Il est important de noter que vous n’aurez que trois chances de prolonger le contrat 
+d’un joueur et que ses demandes salariales seront de plus en plus élevées  au fur 
+et à mesure qu’il rejette vos offres. Une fois qu’un joueur a rompu les négociations  
+(après 3 offres rejetées) , il n’y a pas d’autre issue que de l’échanger à une autre 
+équipe, de demander l’arbitrage à l’entre -saison s’il est RFA ou de l’utiliser 
+et de le laisser aller à l’entre-saison. 
+• À noter que les autres équipes ne peuvent pas voir le nombre d’offres rejetées par un 
+de vos joueurs. Celui-ci est de toute façon remis à zéro lors d’un échange. Il n’est pas 
+non plus obligatoire d’aller au bout des trois offres avant d’échanger un joueur avec 
+lequel vous auriez démarré des négociations. 
+• À chacune de vos offres, il vous est possible de modifier le nombre d’années offertes. 
+5.4.2 Comportement de l’agent pour les prolongations de contrats des agents 
+libres AVEC restriction 
+Lorsque vous tentez de prolonger un joueur autonome AVEC compensation 
+(RFA), il y a une diminution des chances (%) de signer votre joueur lorsque le 
+contrat dépasse les années éligibles à l'autonomie, et cela, de l’ordre de 20% par 
+année supplémentaire. 
+Par exemple : Atomic Tom a 27 ans et est présentement un agent libre avec 
+restriction (RFA) : 
+- 1 ans à 5M$ par an : 100% de chance 
+- 2 ans à 5M$ par an : 80% de chance 
+- 3 ans à 5M$ par an : 60% de chance 
+Explications supplémentaires : Puisque Atomic Tom a 27 ans (RFA), et qu’il aurait 
+droit à l'autonomie complète à 28 ans, toute offre qui ferait en sorte qu’il perde 
+des années d'autonomies aura 20% de moins de chances de réussir , par année 
+additionnelle. Cette mesure vise non seulement à ajouter du réalisme au module 
+de prolongation, mais vise aussi à augmenter le nombre d'échanges et de joueurs 
+disponibles chaque saison. 
+16 | P a g e  
+ 
+5.5 Arbitrage salarial 
+Définition  : L’arbitrage salarial est utilisé par la LHC pour éviter les disputes contractuelles . 
+Au moment  de la négociation  du contrat , si les parties ne s’entendent pas sur  
+la rémunération,  il est possible de faire intervenir un arbitre neutre qui déterminera, après 
+avoir entendu les parties, la rémunération à laquelle le joueur aura droit pour la prochaine 
+saison.  
+L’arbitrage salarial est disponible pour tou t DG qui sent qu’un joueur et son agent 
+ambitionne nt sur leurs demand es salariales . À tous les ans, dès la fin des séries éliminatoires , 
+il sera permis de faire des demandes pour l’arbitrage salarial.  Toute demande d’arbitrage 
+doit être envoyée avant le 1 er juillet. Autrement, le joueur deviendra joueur autonome.  
+Les joueurs éligibles à l’arbitrage salarial sont tous les joueurs de 27 ans et moins  
+(en date du 1er juin), et qui possèdent le statut de RFA et qui en sont à leur 2 e contrat ou plus, 
+en carrière.  
+5.5.1 Fonctionnement de l’arbitrage 
+Un DG désirant porter un joueur en arbitrage devra procéder de la façon 
+suivante  : 
+• Envoyer un message au responsable de l’arbitrage  
+(vincentdolan@hotmail.com ) en précisant le nom du joueur en 
+arbitrage et  en mettant le responsable de la simulation 
+(jonathanbeauchesne@gmail.com ) en copie conforme.  
+• Une fois la demande reçue en bonne et due forme, le responsable 
+de l’arbitrage aura 48 heures pour rendre une décision.  
+• Une fois la décision rendue, le DG aura le choix de signer le joueur 
+aux conditions établies par l’arbitre ou encore de le libérer. Celui -ci 
+deviendra alors joueur autonome sans  compensation et il pourra 
+offrir ses services aux  autres équipes de la LHC à l’exception de  celle 
+qui l’a traîné en arbitrage.  
+5.5.2 Lignes directrices de l’arbitre 
+Rôle de l’arbitre  : L’arbitre fera une moyenne des contrats signés par 3 joueurs 
+ayant signé un contrat après avoir connu une saison semblable à celle du joueur 
+arbitré. Les joueurs considérés seront tous les joueurs depuis 2016 qui : 
+• Occupaient la même position que le joueur ; 
+• Avaient + ou – 1 an d’écart avec le joueur ; 
+• Ont joué un nombre de matchs similaires ; 
+• Avec un temps de jeu semblable ; 
+• Et une moyenne de points par match comparable. 
+17 | P a g e  
+ 
+Le contrat octroyé sera une moyenne des pourcentages de la masse salariale 
+au moment de la signature du contrat. Le contrat sera d’une durée de deux ans. 
+5.4 Libérer un joueur (rachat de contrat) 
+Dès que la prochaine saison morte débute, il vous sera aussi possible de libérer des joueurs 
+en rachetant leur contrat.  
+5.4.1 Impact du rachat 
+Le rachat d’un joueur ne se fait pas sans frais. Le coût de rachat est de 50% par année 
+de contrat restantes. De plus, l’équipe procédant à un rachat de contrat se verra imputé 
+le coût du rachat sur sa masse salariale pour le nombre d’année restante au contrat.  
+L’impact sur la masse salariale du joueur ne peut pas être en-dessous du salaire minimum 
+de la saison courante. 
+Exemple : 
+Victor Mete  a un faramineux contrat de 10 000 000$ pour 4 ans. Toutefois, 
+une fois que la première année de son contrat s’est écoulée, vous désirez procéder 
+au rachat de son contrat.  
+Le calcul suivant est à considérer : 
+(10 000 000$ x 50%) x 4 années restantes = 20 000 000$ 
+Toutefois, votre masse salariale sera imputé de 5 000 000$ de dollars 
+pour les 4 années à venir. 
+5.4.2 Restrictions 
+• Seuls deux (2) rachats seront permis chaque saison , à l’exception 
+des nouveaux DGs qui , eux, pourront bénéficier de trois  (3) rachats 
+à leur première saison ; 
+• Au total, chaque équipe ne peut avoir que trois contrats rachetés ou  dont 
+le salaire est retenu (lors d’un échange) ; 
+• Si un joueur est racheté, il ne pourra pas recevoir une offre  de son ancienne 
+équipe, et ce, pendant les 365 jours suivants son rachat. 
+5.4.3 Périodes où le rachat est impossible 
+• Aucun rachat ne sera possible dans les 7 premiers jours de l’ouverture 
+du marché des joueurs autonomes ; 
+• Aucun rachat ne sera possible entre la date limite des transactions et la fin 
+des séries éliminatoires.
+5.5 Libérations (rachats) sans pénalités 
+Il est possible de se libérer de contrats, et cela sans pénalités. Toutefois, en plus de devoir 
+répondre aux conditions ci -dessous, les joueurs doivent aussi avoir les cotes minimales, 
+dans le portail (et le simulateur).  
+5.5.1 Joueurs retraités de la LNH 
+Un joueur de la LNH qui prend sa retraite n’entraînera pas automatiquement le retrait 
+du joueur dans la LHC. Comme les cotes sont une saison en retard de la LNH, un joueur 
+qui prend sa retraite à la fin d’une saison aura une dernière saison avec des cotes 
+standards (pas le minimum dans tous les attributs) . Une fois cette dernière saison 
+écoulée, le  joueur ayant pris sa retraite aura des cotes de 40 partout. Le  DG à qui 
+appartient les droits de ce joueur pourra le garder s’il est encore sous contrat ou tout 
+simplement le libérer sans frais. 
+5.4.1 Joueurs en Europe 
+Un peu comme pour les joueurs retraités, les joueurs signant un contrat professionnel 
+en Europe auront des cotes pour encore une saison supplémentaire s’ils ont joués 
+dans la LNH. Le  DG possédant les droits d’un joueur ayant quitté la LNH  pour évoluer 
+dans une ligue professionnelle d’Europe aura l’option de le libérer sans frais, 
+dès la deuxième année du contrat du joueur (on ne peut donc pas libérer un joueur 
+sans frais si le contrat a été donné la saison même).  
+Dès lors, si, au terme du contrat, le DG désire garder son option sur le joueur, il pourra 
+le faire en renouvelant le contrat du joueur tel que stipulé en 5.2. 
+Tout comme les joueurs retraités, un joueur ayant quitté pour l’Europe aura des cotes 
+pour une saison suivant son départ. Pour toute saison subséquente, le joueur se verra 
+attribuer une cote de 40 OV. 
+Exceptions 
+Cette clause ne s’applique pas aux situations suivantes : 
+1. Si le joueur évoluait déjà dans une autre ligue (que la NHL), ou si le joueur n’a pas 
+encore joué de match dans la NHL dans la même année, lors de la signature de 
+son contrat ; 
+2. Si le joueur n’avait pas encore joué un match dans la NHL lors de la même année 
+de la signature de son contrat ; 
+5.4.1 Décès d’un joueur 
+Afin de respecter tout joueur qui décède dans la vraie vie, la LHC retirera le joueur du jeu 
+immédiatement à l’annonce du décès. Une compensation, sous forme de choix 
+au repêchage supplémentaire, sera versée à l’équipe qui perd le joueur en fonction 
+de la qualité du joueur perdu. Le choix sera octroyé à la discrétion du président de la ligue. 
+19 | P a g e  
+ 
+6. Valse des joueurs autonomes 
+6.1  Règles générales  
+Entre les deux saisons, à un moment déterminé par le président, vous pourrez faire des offres 
+aux joueurs autonomes avec et sans restriction. 
+6.2  Procédures des signatures  
+L’ouverture officiel le du marché des joueurs autonomes s’ouvrira idéalement entre 
+les 15 et 22 août de chaque année et se poursuivra jusqu’à ce que toutes les concessions aient 
+le minimum requis de joueurs tel que stipulé en 3.1. Notez que l’ouverture du marché des joueurs 
+autonomes s’effectuera toujours un vendredi après-midi, afin de permettre d’obtenir le plus haut 
+niveau de participation possible. 
+Il est important de compléter vos équipes (Pro et F erme) avant le début de la saison régulière. 
+Après quoi, la LHC sélectionnera des joueurs pour vous afin que le minimum de 43 joueurs 
+par équipe soit respecté.  
+Pour faire vos offres, vous devez procéder par le portail dans la section joueur autonome 
+avec et sans restriction. 
+Lorsque vous faites une offre à un joueur : 
+• Une première période de 24h débutera, où il sera possible de connaître le montant total 
+alloué au joueur par la meilleure offre envoyée ; 
+• Par la suite, un second cycle de 24h débutera, mais cette fois-ci, à l’aveugle, c’est-à-dire, 
+que les DGs ne seront plus mis au fait du montant total offert par la meilleure offre. Notez 
+qu'il n'est pas nécessaire de participer dans l'enchère ouverte pour participer à l'enchère 
+à l'aveugle. 
+Par la suite, le joueur choisira l’équipe selon un système de pointage qui prendra en considération 
+le montant alloué versus la durée. Ce système sera dévoilé sous peu. Les offres et signatures sont 
+entièrement gérées par le portail de la ligue. Le choix de l’intelligence artificielle est sans appel. 
+Note importante : Lorsque vous faites des offres, vous devez absolument respecter votre budget. 
+Toute équipe étant prise à passer outre son budget se verra retiré , dans l’ordre de l’offre la plus 
+onéreuse (montant total), les meilleurs joueurs autonomes qu’elle a signés, et ce, jusqu’à ce que 
+son budget soit respecté. 
+6.2.1 Offre salarial minimum et maximum 
+L’offre minimum est de 775 000$. 
+Les DG peuvent offrir un maximum de 20% du plafond salariale de la ligue à un même 
+joueur. Le maximum pour la saison 2023-2024 se situe donc à 17 600 000$. 
+7. Le repêchage 
+7.1 Règles générales 
+Un repêchage des joueurs amateurs aura lieu entre chaque saison , le dimanche suivant la fin 
+de semaine de l’action de grâce. Le repêchage comporte 7 rondes. 
+Les joueurs éligibles à être repêchés sont tous les joueurs âgés de 18 à 21 ans  dont les droits 
+appartiennent à une équipe de la LNH  (soit via repêchage ou autonomie) . Aucun joueur dont 
+les droits n’appartiennent pas à une équipe de la LNH ne sera autorisé à être repêché. 
+Il est possible que vous ne puissiez pas participer au repêchage annuel. En ce sens, s i vous être 
+dans l’impossibilité de participer au repêchage, vo us devez aviser la personne chargée  
+des simulations ( jonathanbeauchesne@gmail.com) au moins une semaine à l’avance et faire 
+parvenir une liste contenant au minimum 46 joueurs  (deux premières ronde), en ordre 
+de préférence. Nous repêcherons alors pour vous. 
+Le sens logique de la personne qui repêchera pour vous sera pris en considération et ses choix 
+seront sans appel. C’est -à-dire qu’il choisira des joueurs au meilleur de sa connaissance 
+et qu’il tentera de ne pas sélectionner que des joueurs de la même position.  
+Si aucune liste n’est envoyée avant le repêchage, le choix de premier et de second tour du DG 
+seront relégués au dernier rang de chaque ronde. Cela s’applique aux choix possédés par les DG 
+au moment du repêchage, et non pas aux choix originalement destinés à ces équipes. 
+Dans le cas des rondes trois à sept, si un DG absent n’a pas envoyé  de liste, la ligue 
+va systématiquement repêcher le premier joueur disponible selon le rang de sélection de la NHL, 
+et ce, peu importe sa position. 
+7.1 Ordre de sélection et loterie 
+À la conclusion de la saison régulière, les 8 équipes non-participantes aux séries éliminatoires 
+seront entrées dans une loterie, afin d’avoir la possibilité d’obtenir le 1er ou le 2e choix au prochain 
+repêchage. L’équipe ayant terminée en dernière position aura  la meilleure chance d’obtenir 
+le 1er choix, les chances diminuant jusqu’à la 17e position. 
+Chances de repêcher le tout premier choix (lors d’une saison sans expansion) : 
+- 24e --> 27%  - 20e --> 9% 
+- 23e --> 22%  - 19e --> 6% 
+- 22e --> 17%  - 18e --> 4% 
+- 21e --> 13%  - 17e --> 2% 
+  
+21 | P a g e  
+ 
+Chances de repêcher le tout premier choix (lors d’une saison d’expansion) : 
+- 24e --> 26%  - 20e --> 9% 
+- 23e --> 21%  - 19e --> 6% 
+- 22e --> 16%  - 18e --> 4% 
+- 21e --> 16%  - 17e --> 2% 
+Le gagnant remporte la loterie pour un choix et toutes les équipes reculent d’un seul rang. 
+Une fois la  première loterie terminée, le même procédé s’applique pour le second choix. 
+À noter qu’il ne s’agit que d’une loterie pour la première ronde de sélection. Également, à partir 
+du repêchage de 2022, une équipe ne pourra remporter la loterie  (1er ou 2e choix) plus de 2 fois 
+dans une période de 5 ans.  Les repêchages antérieurs à 2022 ne seront ainsi pas comptabilisés 
+pour cette règle. 
+Les équipes s’étant qualifiées pour les séries sans gagner leur division ou se qualifier 
+pour les finales de conférences sont voient assigner les choix suivants par ordre inverse 
+du classement, suivi des équipes ayant gagné leur division, des équipes s’étant qualifiées 
+pour les finales de conférence, de l’équipe finaliste de la Coupe et , finalement, de l’équipe 
+gagnante de la Coupe. 
+Les égalités au classement sont brisées par le nombre de victoires en temps réguliers, ensuite 
+par le nombre de victoires en prolongation excluant les tirs de barrage, puis par la fiche entre 
+les deux équipes si une égalité demeure.
+8. Les transactions 
+8.1 Règles générales 
+La partie la plus plaisante d’une saison est de transiger avec une autre équipe. Quoi de plus 
+plaisant que d’entrer en grande négociation avec un autre DG afin d’acquérir un joueur 
+ou un choix convoité qui pourrait faire la différence dans votre équipe. 
+Une règle simple s’applique dans ce domaine et c’est la courtoisie. Il est possible que vous receviez 
+des offres tout à fait farfelues des autres équipes. Dans ce cas, retournez une réponse 
+en mentionnant simplement « Non merci ». L’invectiver avec véhémence n’est pas ce que 
+nous voulons. 
+Il est dans l’obligation de chaque DG  de retourner une réponse dans les plus brefs délais, 
+car quelqu’un à l’autre bout attend. En ce sens, 48h devraient généralement être suffisant es 
+pour répondre par un oui ou un non. 
+Lorsque deux équipes en viennent à une entente, ils doivent obligatoirement passer par l’option 
+Transactions sur le site de la ligue. Et les deux équipes doivent accepter la transaction , 
+faute de quoi elle ne sera pas approuvée. 
+Les équipes doivent motiver leur transaction afin d’aider le comité d’évaluation des transactions 
+à analyser la transaction et rendre une décision juste et éclairée. Les DGs doivent ainsi expliquer 
+en quoi l’échange apporte une plus -value à LEUR équipe, et ne doivent pas se contenter 
+de seulement décrire l’échange. Dès lors, si l’administrateur de la ligue juge que l’échange n’est 
+pas suffisamment justifié, ce dernier se réserve le droit de refuser l’échange.  
+8.2 Ce qui peut être échangé 
+Des joueurs, des choix (des trois prochains repêchages), et des prospects, peuvent être inclus dans 
+une transaction.  
+Il doit y avoir un délai de 365 jours avant qu'une équipe puisse récupérer un joueur 
+qu'elle a échangé, via une transaction. Toutefois, l’équipe peut récupérer le joueur via le module 
+des agents libres, lors de la saison suivante. 
+Une équipe doit en tout temps posséder  un minimum de 3 choix de repêchage par année  ainsi 
+qu’au moins un choix dans les trois premières rondes pour chaque repêchage. Si une transaction 
+fait en sorte qu’un club ne respecte pas ces règles, elle sera refusée. 
+8.2.1 Salaires retenus 
+Il est permis de retenir une portion du salaire des joueurs lors d’une transaction. Le salaire 
+retenu comptera directement sur la masse salariale et  le plafond des dépenses 
+23 | P a g e  
+ 
+de l’équipe, et ce, jusqu’à l’échéance du contrat. Pour ce faire, les critères suivants 
+doivent être respectés : 
+• Le pourcentage retenu ne peut être supérieur à 50% du salaire ; 
+• L’impact sur la masse salariale du joueur acquis ne peut pas être en -dessous 
+du salaire minimum de la saison courante. 
+• Les équipes sont limitées à trois salaires retenus en même temps ; 
+• Les équipes ne peuvent retenir un montant total de plus de 15% de la limite 
+du plafond salarial ; 
+• Le contrat d’un joueur est limité à un maximum de deux transactions , 
+qui impliquent une retenue de salaire ; 
+• Si un club transige un joueur tout en conservant une portion de son salaire et que 
+ce dernier voit son pacte être racheté par la suite, toutes les formations ayant 
+retenu un pourcentage de son contrat se verront appliquer les pénalités 
+au prorata ; 
+• Si un joueur qui a fait partie d’une transaction dont il y a eu retenue 
+d’un pourcentage de salaire est envoyé dans les mineures, l’équipe d’origine doit 
+tout de même continuer à inclure sa portion retenue sur sa masse salariale. 
+8.3 Comité d’évaluation des transactions 
+Dans un souci d’équité et pour éviter tout débalancement de la ligue, un comité formé 
+par le président veille à ce que toutes les transactions soient justes , équitables et respectent 
+la valeur du marché.  
+Le rôle du comité d’évaluation des transactions est également de protéger les nouveaux DG , 
+afin que les DG plus rusés ne profitent de leur naïveté et mettent en péril la santé de la concession 
+par des transactions trop avantageuses à long terme contre la franchise des nouveaux DG. 
+Toutes les transactions sont évaluées par le comité , sans exception.  Si un ou plusieurs 
+des membres du comité sont impliqués dans la transaction, le nombre équivalent de substituts 
+du comité sera appelé à délibérer de la justesse de la transaction. 
+Les membres du comité d ’évaluation des transactions ont 48h pour rendre leur décision. 
+Si le comité juge que la transaction n’est pas équitable pour une des deux parties, le comité 
+apposera son droit de véto et la transaction sera refusée. 
+Les membres du comité doivent motiver leur refus d’accepter une transaction, et cela, dans le but 
+d’aider les parties impliquées à revoir leur transaction et à en refaire une meilleure. 
+8.3.1 Rôle et Critères d’évaluations 
+Le comité d’évaluation des transactions doit tenir compte des divers règlements stipulés 
+en 8.2 qui régissent tous les directeurs généraux de la ligue.  
+24 | P a g e  
+ 
+Le plafond salarial ainsi que le plancher salarial, si la transaction est acceptée, doivent être 
+pris en considération. Toute transaction impliquant qu’une concession franchisse 
+l’un ou l’autre devra être automatiquement refusé e, et ce, peu importe la justesse 
+de la transaction. 
+Le comité de transactions ne doit pas tenir compte du fait qu’il y ait un gagnant 
+ou un perdant à une transaction, car les transactions sont rarement égales. L’équilibre 
+de la transaction est le facteur majeur à considérer. 
+Le comité de transactions doit fortement considérer les arguments apportés 
+par les parties impliquées  dans la transaction , car ceux-ci constituent le fondement 
+de la transaction. 
+8.3.2 Délibération du comité 
+Les membres du comité doivent faire les délibérations entre eux et nommer un 
+représentant qui , lui, enverra la répon se au responsable des simulations . Dans 
+l’éventualité d’un refus, cette personne aura la tâche de motiver le refus qui , lui, sera 
+ensuite envoyé aux parties impliquées dans la transaction. 
+8.3.3 Membres du comité 
+  - Marc-André Noël (Minnesota) 
+  - Étienne Molotchnikoff (Pittsburgh) 
+  - Joel Meloche (St-Louis) 
+8.3.4 Substituts du comité 
+  - Francis Faubert (Anaheim) 
+  - Vincent Dolan (Winnipeg) 
+8.4 Date limite des transactions 
+La date limite des transactions se situe à 80% de la saison régulière. Un avis vous sera envoyé par 
+la personne chargée des simulations à l’approche de celle-ci. 
+8.5 Parrainage des nouveaux DGs 
+À son arrivée dans la ligue, chaque nouveau DG se verra attribué deux parrains, pour un an. Le rôle 
+des parrains, en plus de répondre aux questions du nouveaux DG et de le guider à travers 
+sa première année en poste, sera d’approuver au préalable (en comité) tout échange du nouveau 
+DG avant que celui -ci ne soit transmis au comité. Cette mesure a pour but de soutenir les DGs 
+dans leurs premières négociations et d’ajouter un mécanisme additionnel pour éviter de mettre 
+en péril la santé de la concession. 
+  
+25 | P a g e  
+ 
+9. Renvois aux mineures 
+9.1 Règles générales 
+Tous les  joueurs âgés de 24 ans et plus ayant joué au moins 21 parties avec l’équipe 
+professionnelle doivent être soumis au ballotage avant d’être envoyés dans les ligues mineures . 
+Les joueurs de 23 ans et moins jouissent donc d’une immunité totale et peuvent aller et venir 
+entre l’équipe professionnelle et l’équipe école sans avoir à être soumis au ballotage. 
+Lorsqu’un joueur est cédé au ballotage, une notification est envoyée à l’administrateur de la ligue. 
+À ce moment, il enverra un courriel à tous les DG pour les en aviser. Si un DG désire réclamer un 
+joueur soumis au ballotage, il devra informer l’administrateur de la ligue par courriel dans les 48 
+heures suivantes.  
+L’ordre de priorité pour le ballotage est basé sur le classement inverse de la saison en cours, selon 
+les points accumulés en cours de saison (au prorata des parties jouées) . En cas d’égalité, le bris 
+d’égalité suivra la même logique que celle pour indiquer les équipes éligibles aux séries 
+éliminatoires.  
+9.2 Restrictions 
+Les meilleurs joueurs de chaque position (4 centres, 4 ailiers gauches, 4 ailiers droits, 6 défenseurs 
+et 2 gardiens) doivent être en tout temps (séries inclues) dans le club professionnel. On entend 
+par meilleurs joueurs les joueurs possédant le meilleur OV. Le nom et la réputation du joueur dans 
+la LNH ne sont pas pris en considération. 
+9.3 Exclusions 
+Après la date limite des transactions, les joueurs ne peuvent être soumis au ballotage, et ce, 
+jusqu’à la conclusion des séries éliminatoires. 
+10. Sanctions 
+11.1 Amendes en lien avec les effectifs 
+Dans le cas d'un non-respect d’un règlement lié aux effectifs, avant le début de la saison régulière, 
+la ligue va se donner le droit de signer des joueurs, à la place de l'équipe, et si le nombre de contrat 
+maximum est atteint, de renvoyer les dernières signatures de l'équipe dans le marché des agents 
+libres. 
+11.2 Diverses amendes 
+Malheureusement, comme dans la vraie vie, il y aura toujours des DG récalcitrants à se conformer 
+aux diverses règles qui régissent la LHC. 
+C’est à ce moment qu’entre nt en jeu les sanctions supplémentaires imposées aux équipes 
+contrevenantes aux diverses règles et procédures du jeu. 
+Pour toute première offense à un des règlements, l’équipe fautive se verra suspendre son meilleur 
+patineur (gardien exclu) pour une partie. 
+Si cette même équipe est prise à ne pas respecter le même règlement, elle sera considérée 
+comme récidiviste et se verra suspendre son meilleur patineur (gardien exclu) pour cinq parties. 
+Si, après ces deux avertissements, le DG n’a  pas compris le principe, le président se donnera 
+le droit de le congédier et de le remplacer sans préavis. 
+À noter qu’une même équipe se doit de contrevenir à un même règlement plusieurs fois pour 
+passer au  second et troisième degré d’une sanction. Si une équipe contrevient une seule fois 
+à plusieurs règlements différents, elle ne sera pas considérée comme récidiviste. 
+27 | P a g e  
+ 
+11. Mauvais comportement 
+12.1 Règle générale 
+La LHCsim a été créée en 2002 par Hugo St -Onge dans le but de regrouper des gens , des amis , 
+désirant mettre à l’épreuve leurs connaissances en matière de hockey en se mesurant à des 
+adversaires partageant le même but. Le but est de s’amuser tout en essayant de mettre sur pied 
+la meilleure concession possible. 
+Il est important de comprendre que tout ceci n’est qu’un jeu, que le nom des joueurs utilisés dans 
+le jeu, bien que réels, ne représente aux yeux du simulateur que des 1 et des 0. 
+C’est pour cette raison qu’aucun mauvais comportement à l’endroit de vos collègues, du 
+président ou de la personne chargée des simulations ne sera toléré. 
+Si vous êtes victimes de harcèlement ou de violence verbale d’un confrère DG, communiquez 
+immédiatement avec l’administrateur de la ligue.  
+La ligue prend au sérieux toute allégation à ce sujet et investiguera sous peine d’expulser le 
+contrevenant de la ligue sans avertissement. 
+12.2 Fairplay 
+S’il y a une suspicion qu’un DG tente de volontairement perdre des parties dans le but de terminer 
+le plus bas possible au classement. Un avertissement sera envoyé au DG , afin qu’il rectifie ses 
+alignements et stratégies. 
+Si, après l’avertissement, le DG fautif ne rectifie pas la situation dans les 48h et que des suspicions 
+se posent toujours sur lui, après délibération avec les membres du comité des échanges, celui-ci 
+perdra son rang de sélection pour la première ronde et sélectionnera au dernier rang. 
+  
+28 | P a g e  
+ 
+12. Les mentions 
+13.1 Trophées individuels 
+À la fin de chaque saison, vous serez conviés à voter pour les joueurs qui se sont le plus démarqués 
+au niveau individuel , en plus du meilleur DG. Un sondage vous sera transmis par la personne 
+responsable des simulations, lors de la période des séries éliminatoires, dans lequel vous devrez 
+voter pour les choix qui vous seront proposés.   
+29 | P a g e  
+ 
+13. Les cotes 
+14.1 Comité des cotes 
+Chaque saison, après la fin des séries éliminatoires, l’administrateur de la ligue va proposer 
+une liste de paramètres pour le calcul des cotes des joueurs  au comité des cotes.  Ce dernier 
+donnera donc son aval, afin que les cotes soient produites. 
+Membres du comité : 
+- Étienne Molotchnikoff (PIT) ; 
+- Francis Faubert (ANA) ; 
+- Jean-Philippe Godard (OTT) ; 
+- Joel Meloche (STL) ; 
+- Marc-André Noel (MIN) ; 
+- Samuel Fortin (WSH) ; 
+- Vincent Dolan (WIN) ; 
+14.2 Révision des cotes calculées 
+Afin de rendre justice aux joueurs ayant connu des circonstances fâcheuses et fortuites, les DGs 
+pourront soumettre le nom de deux joueurs, chaque saison, afin que leurs cotes de l'année 
+précédente puissent être considérées à 50% dans le calcul des cotes de l’année en cours.  
+• Condition n°1 - Un argumentaire devra être fourni au Comité (et pas seulement des liens), 
+afin de prouver que le joueur a manqué plus de 50% des parties du calendrier régulier dû 
+à une/des blessure(s). Dès lors, un joueur qui était simplement « healthy scratch » ou mal-
+aimé par son coach ne pourra pas passer par ce processus. 
+• Condition n° 2 – La demande devra être envoyée au plus tard une semaine après 
+le dévoilement des nouvelles cotes en juin. Autrement, la demande sera refusée 
+automatiquement. 
+• Critère d’exclusion - Un joueur ayant reçu une extension de contrat ne pourra passer 
+par ce processus ; 
+14. Dates importantes 
+15.1 Calendrier type 
+Voici un calendrier type des da tes importantes à chaque année. Celui -ci est sujet 
+à des changements importants en fonction des aléas de la vie, mais toute date importante 
+vous sera de toute façon toujours communiquée à l’avance par l’administrateur de la ligue. 
+• 1er juillet – Début de la nouvelle année (les contrats progressent d’une année, les cotes 
+sont mises à jour et les nouveaux règlements entrent en vigueur) 
+• 1er juillet – Période de signature des prospects 
+• 15 août – Date limite pour faire graduer les prospects de 23 ans 
+• 3e vendredi d’août – Ouverture de la valse des joueurs autonomes 
+• Septembre – Début de la présaison 
+• Octobre – Début de la saison régulière 
+• 3e dimanche d’octobre – Repêchage de la LHC 
+• 80% de la saison régulière – Date limite des transactions 
+• Mars – Assises de la LHC (discussion sur les modifications à apporter aux règlements en 
+vue de l’année prochaine) 
+• Fin de la saison régulière – Sondage sur les trophées 
+• Avril – Début des séries éliminatoires 
+• Mai – Fin des séries éliminatoires 
+• Fin des séries – Réouverture des transactions 
+• Fin des séries – Les DGs peuvent envoyer leurs demandes d’arbitrage 
+• 1er juin – L’âge des joueurs est figée pour leur statut UFA/RFA 
+• Juin – Annonce des cotes pour la prochaine saison 
+• 30 juin – Date limite pour prolonger les joueurs sans contrats (UFA/RFA) et pour envoyer 
+les demandes d’arbitrages 
+• 30 juin – Fin de l’année 
+ 

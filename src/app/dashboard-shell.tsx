@@ -1,19 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
-import { DashboardNav } from "@/app/dashboard-nav";
 import { DraftPickOrderEditor } from "@/app/draft-pick-order-editor";
 import { PlayerDirectoryPanel } from "@/app/player-directory-panel";
 import { PlayerHeadshot } from "@/app/player-headshot";
 import { PlayerLink } from "@/app/player-link";
-import { SourceHoverLabel } from "@/app/source-hover-label";
+import { RosterLinesView } from "@/app/roster-lines-view";
+import { StandalonePageHeader } from "@/app/standalone-page-header";
 import { TeamLink } from "@/app/team-link";
-import type { DraftOrder, DraftPick, DashboardSourceInfo } from "@/lib/domain";
 import { formatDraftPickTeamLabel, getDraftPickIssuerTeam, hasTradedDraftPick } from "@/lib/draft-pick-order";
+import type { DashboardSourceInfo, DraftOrder, DraftPick } from "@/lib/domain";
 import type { DirectoryPlayer } from "@/lib/player-directory";
+import { CAP_STATUS_LABELS, formatMillions } from "@/lib/salary-cap";
 import type { DashboardSnapshot, PickScore, RosterScore, TradeTarget } from "@/lib/valuation";
 import { tradeRange } from "@/lib/valuation";
 
@@ -27,7 +27,7 @@ type DashboardShellProps = {
 };
 
 type DashboardTab = "overview" | "roster" | "market" | "draft" | "players";
-type RosterView = "table" | "cards" | "chart";
+type RosterView = "table" | "chart" | "lines" | "breakdown";
 type MarketView = "targets" | "needs";
 type DraftView = "table" | "chart" | "editor";
 type SortDirection = "asc" | "desc";
@@ -35,7 +35,7 @@ type RosterSortKey = "name" | "position" | "age" | "capHit" | "score";
 type PickSortKey = "team" | "season" | "round" | "projectedSlot" | "score";
 
 const dashboardTabs: DashboardTab[] = ["overview", "roster", "market", "draft", "players"];
-const rosterViews: RosterView[] = ["table", "cards", "chart"];
+const rosterViews: RosterView[] = ["lines", "breakdown", "table", "chart"];
 const marketViews: MarketView[] = ["targets", "needs"];
 const draftViews: DraftView[] = ["table", "chart", "editor"];
 const rosterSortKeys: RosterSortKey[] = ["name", "position", "age", "capHit", "score"];
@@ -89,6 +89,13 @@ const ageBucketLabel = (age: number) => {
   return "33+";
 };
 
+const capStatusStyles: Record<DashboardSnapshot["payroll"]["status"], { badge: string; bar: string }> = {
+  compliant: { badge: "bg-emerald-100 text-emerald-700", bar: "bg-emerald-500" },
+  "below-floor": { badge: "bg-amber-100 text-amber-700", bar: "bg-amber-500" },
+  "over-ceiling": { badge: "bg-rose-100 text-rose-700", bar: "bg-rose-500" },
+  "over-spending-ceiling": { badge: "bg-rose-100 text-rose-700", bar: "bg-rose-500" },
+};
+
 const getInitialParamValue = (
   initialSearchParams: Record<string, string | string[] | undefined>,
   key: string,
@@ -108,7 +115,7 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
   );
   const [pendingTab, setPendingTab] = useState<DashboardTab | null>(null);
   const [rosterView, setRosterView] = useState<RosterView>(() =>
-    parseEnumParam(getInitialParamValue(initialSearchParams, "rv"), rosterViews, "table"),
+    parseEnumParam(getInitialParamValue(initialSearchParams, "rv"), rosterViews, "lines"),
   );
   const [marketView, setMarketView] = useState<MarketView>(() =>
     parseEnumParam(getInitialParamValue(initialSearchParams, "mv"), marketViews, "targets"),
@@ -314,12 +321,20 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
   const maxAgeBucketCount = Math.max(...rosterAgeSummary.map((bucket) => bucket.count), 1);
   const maxPickYearValue = Math.max(...pickYearSummary.map((entry) => entry.totalValue), 1);
   const maxPickRoundValue = Math.max(...pickRoundSummary.map((entry) => entry.averageValue), 1);
+  const rosterLinesResetKey = useMemo(
+    () =>
+      snapshot.rosterScores
+        .map((player) => `${player.id}:${player.score}:${player.inMinors ? 1 : 0}`)
+        .sort()
+        .join("|"),
+    [snapshot.rosterScores],
+  );
 
   useEffect(() => {
     const nextParams = new URLSearchParams();
 
     if (activeTab !== "overview") nextParams.set("tab", activeTab);
-    if (rosterView !== "table") nextParams.set("rv", rosterView);
+    if (rosterView !== "lines") nextParams.set("rv", rosterView);
     if (marketView !== "targets") nextParams.set("mv", marketView);
     if (draftView !== "table") nextParams.set("dv", draftView);
     if (rosterQuery) nextParams.set("rq", rosterQuery);
@@ -357,15 +372,14 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
   return (
     <div className="min-h-screen px-4 py-6 sm:px-6 lg:px-8">
       <main className="mx-auto flex w-full max-w-[96rem] flex-col gap-5">
-        <section className="relative z-20 overflow-visible rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] shadow-[0_20px_60px_rgba(17,32,49,0.08)] backdrop-blur">
-          <div className="px-5 py-6 sm:px-6 lg:px-8 lg:py-8">
-            <div className="space-y-5">
-              <div className="flex flex-wrap items-center justify-start gap-2">
-                <DashboardNav activeTab={activeTab} onSelectTab={handleTabChange} />
-                <SourceHoverLabel className="ml-auto" source={source} summary={sourceSummary} />
-              </div>
-              {activeTab === "overview" ? (
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <StandalonePageHeader
+          activeTab={activeTab}
+          source={source}
+          sourceSummary={sourceSummary}
+          onSelectTab={handleTabChange}
+        >
+          {activeTab === "overview" ? (
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                   <div className="rounded-[1.5rem] border border-[var(--line)] bg-white/80 p-4 backdrop-blur">
                     <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Rostered assets</p>
                     <p className="mt-3 text-3xl font-semibold text-slate-900">{snapshot.rosterScores.length}</p>
@@ -388,14 +402,12 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
                   </div>
                 </div>
               ) : null}
-              {source.detail ? (
-                <p className="max-w-2xl rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-                  {source.detail}
-                </p>
-              ) : null}
-            </div>
-          </div>
-        </section>
+          {source.detail ? (
+            <p className="max-w-2xl rounded-3xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+              {source.detail}
+            </p>
+          ) : null}
+        </StandalonePageHeader>
 
         {activeTab === "overview" ? (
           <section className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
@@ -416,6 +428,122 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
                   <p className="mt-3 text-2xl font-semibold text-slate-900">{snapshot.team.prospectCount}</p>
                   <p className="mt-2 text-sm text-slate-600">Tracked prospects</p>
                 </div>
+              </section>
+              <section className="rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_20px_60px_rgba(17,32,49,0.06)]">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Payroll</p>
+                    <h2 className="mt-2 text-2xl font-semibold text-slate-900">Cap compliance ({snapshot.payroll.parameters.season})</h2>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${capStatusStyles[snapshot.payroll.status].badge}`}>
+                    {CAP_STATUS_LABELS[snapshot.payroll.status]}
+                  </span>
+                </div>
+                <div className="mt-5 flex items-end justify-between gap-4">
+                  <p className="text-4xl font-semibold text-slate-900">{formatMillions(snapshot.payroll.capCharges)}</p>
+                  <p className="text-sm text-slate-600">
+                    {snapshot.payroll.capSpaceRemaining >= 0
+                      ? `${formatMillions(snapshot.payroll.capSpaceRemaining)} under the cap`
+                      : `${formatMillions(Math.abs(snapshot.payroll.capSpaceRemaining))} over the cap`}
+                  </p>
+                </div>
+                <div className="relative mt-4 h-3 rounded-full bg-slate-200">
+                  <div
+                    className={`h-full rounded-full ${capStatusStyles[snapshot.payroll.status].bar}`}
+                    style={{
+                      width: `${Math.min(100, Math.max(0, (snapshot.payroll.capCharges / snapshot.payroll.spendingCeiling) * 100))}%`,
+                    }}
+                  />
+                  <div
+                    className="absolute top-[-4px] h-5 w-0.5 bg-amber-500"
+                    style={{ left: `${(snapshot.payroll.parameters.salaryFloor / snapshot.payroll.spendingCeiling) * 100}%` }}
+                    title="Floor"
+                  />
+                  <div
+                    className="absolute top-[-4px] h-5 w-0.5 bg-slate-700"
+                    style={{ left: `${(snapshot.payroll.parameters.salaryCeiling / snapshot.payroll.spendingCeiling) * 100}%` }}
+                    title="Salary ceiling"
+                  />
+                </div>
+                <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                  <div className="rounded-2xl bg-white/75 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Salary cap (masse salariale)</p>
+                    <dl className="mt-3 space-y-1.5 text-sm">
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-slate-600">Pro salaries</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.proPayroll)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-slate-600">Farm salaries (adj.)</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.minorPayrollAdjusted)}</dd>
+                      </div>
+                      {snapshot.payroll.contractPenalties > 0 ? (
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-slate-600">Contract penalties</dt>
+                          <dd className="font-mono text-slate-900">+{formatMillions(snapshot.payroll.contractPenalties)}</dd>
+                        </div>
+                      ) : null}
+                      {snapshot.payroll.injuredRelief > 0 ? (
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-slate-600">Injured relief</dt>
+                          <dd className="font-mono text-slate-900">-{formatMillions(snapshot.payroll.injuredRelief)}</dd>
+                        </div>
+                      ) : null}
+                      <div className="mt-1 flex justify-between gap-4 border-t border-[var(--line)] pt-2 font-semibold">
+                        <dt className="text-slate-700">Cap charge</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.capCharges)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-slate-600">Salary ceiling</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.parameters.salaryCeiling)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-4 border-t border-[var(--line)] pt-2 font-semibold">
+                        <dt className="text-slate-700">Cap space remaining</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.capSpaceRemaining)}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                  <div className="rounded-2xl bg-white/75 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Spending ceiling (finances)</p>
+                    <dl className="mt-3 space-y-1.5 text-sm">
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-slate-600">Pro salaries</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.proPayroll)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-slate-600">Farm salaries (full)</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.minorPayroll)}</dd>
+                      </div>
+                      {snapshot.payroll.contractPenalties > 0 ? (
+                        <div className="flex justify-between gap-4">
+                          <dt className="text-slate-600">Contract penalties</dt>
+                          <dd className="font-mono text-slate-900">+{formatMillions(snapshot.payroll.contractPenalties)}</dd>
+                        </div>
+                      ) : null}
+                      <div className="mt-1 flex justify-between gap-4 border-t border-[var(--line)] pt-2 font-semibold">
+                        <dt className="text-slate-700">Total spending</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.spendingCharges)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-4">
+                        <dt className="text-slate-600">Spending ceiling</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.spendingCeiling)}</dd>
+                      </div>
+                      <div className="flex justify-between gap-4 border-t border-[var(--line)] pt-2 font-semibold">
+                        <dt className="text-slate-700">Spending space remaining</dt>
+                        <dd className="font-mono text-slate-900">{formatMillions(snapshot.payroll.spendingSpaceRemaining)}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+                <p className="mt-4 text-sm text-slate-600">
+                  {snapshot.payroll.contractCount} contracts · floor {formatMillions(snapshot.payroll.parameters.salaryFloor)}
+                  {snapshot.payroll.minorContractCount > 0
+                    ? ` · ${snapshot.payroll.minorContractCount} buried in farm (${formatMillions(snapshot.payroll.minorReliefSavings)} relief)`
+                    : ""}
+                  {snapshot.payroll.prospectContractCount > 0
+                    ? ` · ${snapshot.payroll.prospectContractCount} prospects excluded (${formatMillions(snapshot.payroll.prospectPayroll)})`
+                    : ""}
+                </p>
               </section>
               <section className="rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_20px_60px_rgba(17,32,49,0.06)]">
                 <div className="flex items-end justify-between gap-4">
@@ -490,30 +618,28 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
 
         {activeTab === "roster" ? (
           <section className="rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_20px_60px_rgba(17,32,49,0.06)]">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Roster valuation</p>
-                <h2 className="mt-2 text-2xl font-semibold text-slate-900">
-                  <TeamLink className="underline-offset-4 hover:underline" team={snapshot.teamName}>
-                    {snapshot.teamName}
-                  </TeamLink>{" "}
-                  assets by role and market value
-                </h2>
-              </div>
+            <div className="flex flex-wrap justify-end gap-4">
               <div className="flex flex-wrap gap-2">
+                <button
+                  className={`rounded-full px-4 py-2 text-sm font-semibold ${rosterView === "lines" ? "bg-slate-900 text-white" : "border border-[var(--line)] bg-white text-slate-700"}`}
+                  onClick={() => setRosterView("lines")}
+                  type="button"
+                >
+                  Lines view
+                </button>
+                <button
+                  className={`rounded-full px-4 py-2 text-sm font-semibold ${rosterView === "breakdown" ? "bg-slate-900 text-white" : "border border-[var(--line)] bg-white text-slate-700"}`}
+                  onClick={() => setRosterView("breakdown")}
+                  type="button"
+                >
+                  Contract view
+                </button>
                 <button
                   className={`rounded-full px-4 py-2 text-sm font-semibold ${rosterView === "table" ? "bg-slate-900 text-white" : "border border-[var(--line)] bg-white text-slate-700"}`}
                   onClick={() => setRosterView("table")}
                   type="button"
                 >
                   Table view
-                </button>
-                <button
-                  className={`rounded-full px-4 py-2 text-sm font-semibold ${rosterView === "cards" ? "bg-slate-900 text-white" : "border border-[var(--line)] bg-white text-slate-700"}`}
-                  onClick={() => setRosterView("cards")}
-                  type="button"
-                >
-                  Card view
                 </button>
                 <button
                   className={`rounded-full px-4 py-2 text-sm font-semibold ${rosterView === "chart" ? "bg-slate-900 text-white" : "border border-[var(--line)] bg-white text-slate-700"}`}
@@ -524,32 +650,34 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
                 </button>
               </div>
             </div>
-            <div className="mt-6 flex flex-wrap items-end gap-3 rounded-[1.5rem] border border-[var(--line)] bg-white/70 p-4">
-              <label className="min-w-[14rem] flex-1 text-sm text-slate-700">
-                <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-slate-500">Search roster</span>
-                <input
-                  className="w-full rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-slate-900"
-                  placeholder="Player or role"
-                  type="search"
-                  value={rosterQuery}
-                  onChange={(event) => setRosterQuery(event.target.value)}
-                />
-              </label>
-              <label className="w-full max-w-[12rem] text-sm text-slate-700">
-                <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-slate-500">Position</span>
-                <select
-                  className="w-full rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-slate-900"
-                  value={rosterPositionFilter}
-                  onChange={(event) => setRosterPositionFilter(event.target.value)}
-                >
-                  <option value="all">All positions</option>
-                  {rosterPositions.map((position) => (
-                    <option key={position} value={position}>{position}</option>
-                  ))}
-                </select>
-              </label>
-              <p className="text-sm text-slate-600">Showing {sortedRoster.length} of {snapshot.rosterScores.length} players</p>
-            </div>
+            {rosterView === "table" || rosterView === "chart" ? (
+              <div className="mt-6 flex flex-wrap items-end gap-3 rounded-[1.5rem] border border-[var(--line)] bg-white/70 p-4">
+                <label className="min-w-[14rem] flex-1 text-sm text-slate-700">
+                  <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-slate-500">Search roster</span>
+                  <input
+                    className="w-full rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-slate-900"
+                    placeholder="Player or role"
+                    type="search"
+                    value={rosterQuery}
+                    onChange={(event) => setRosterQuery(event.target.value)}
+                  />
+                </label>
+                <label className="w-full max-w-[12rem] text-sm text-slate-700">
+                  <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-slate-500">Position</span>
+                  <select
+                    className="w-full rounded-xl border border-[var(--line)] bg-white px-3 py-2 text-slate-900"
+                    value={rosterPositionFilter}
+                    onChange={(event) => setRosterPositionFilter(event.target.value)}
+                  >
+                    <option value="all">All positions</option>
+                    {rosterPositions.map((position) => (
+                      <option key={position} value={position}>{position}</option>
+                    ))}
+                  </select>
+                </label>
+                <p className="text-sm text-slate-600">Showing {sortedRoster.length} of {snapshot.rosterScores.length} players</p>
+              </div>
+            ) : null}
             {rosterView === "table" ? (
               <div className="mt-6 overflow-hidden rounded-[1.5rem] border border-[var(--line)] bg-white/75 shadow-[0_18px_40px_rgba(37,99,235,0.08)]">
                 <table className="min-w-full border-collapse text-left">
@@ -611,36 +739,6 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
                     ))}
                   </tbody>
                 </table>
-              </div>
-            ) : null}
-            {rosterView === "cards" ? (
-              <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {sortedRoster.map((player) => (
-                  <article key={player.id} className="rounded-[1.5rem] border border-[var(--line)] bg-white/70 p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-start gap-3">
-                        <PlayerHeadshot
-                          alt={player.name}
-                          className="h-14 w-14 rounded-[1.15rem] object-cover"
-                          fallbackClassName="grid h-14 w-14 place-items-center rounded-[1.15rem] bg-[linear-gradient(135deg,rgba(15,118,110,0.95),rgba(180,83,9,0.82))] text-base font-semibold text-white"
-                          name={player.name}
-                        />
-                        <div>
-                          <h3 className="text-lg font-semibold text-slate-900">{player.name}</h3>
-                          <p className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">{player.position} / age {player.age}</p>
-                        </div>
-                      </div>
-                      <p className="rounded-full bg-slate-900 px-3 py-1 text-sm font-semibold text-white">{player.score}</p>
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-slate-700">{player.role}</p>
-                    <p className="mt-3 text-sm text-slate-600">Cap hit ${player.capHit.toFixed(1)}M</p>
-                    <p className="mt-2 text-sm font-semibold text-slate-900">{player.extension.label}</p>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">{player.extension.detail}</p>
-                    <div className="mt-4">
-                      <Link className="text-sm font-semibold text-[var(--accent)] underline-offset-4 hover:underline" href={`/players/${encodeURIComponent(player.id)}`}>Open full profile</Link>
-                    </div>
-                  </article>
-                ))}
               </div>
             ) : null}
             {rosterView === "chart" ? (
@@ -720,6 +818,24 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
                   </div>
                 </div>
               </div>
+            ) : null}
+            {rosterView === "lines" ? (
+              <RosterLinesView
+                key={rosterLinesResetKey}
+                availablePlayers={players}
+                players={snapshot.rosterScores}
+                teamName={snapshot.teamName}
+                view="lines"
+              />
+            ) : null}
+            {rosterView === "breakdown" ? (
+              <RosterLinesView
+                key={`${rosterLinesResetKey}:breakdown`}
+                availablePlayers={players}
+                players={snapshot.rosterScores}
+                teamName={snapshot.teamName}
+                view="breakdown"
+              />
             ) : null}
           </section>
         ) : null}
@@ -813,11 +929,37 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
         ) : null}
 
         {activeTab === "draft" ? (
-          <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
+          <section>
             <article className="rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_20px_60px_rgba(17,32,49,0.06)]">
               <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Draft capital</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Draft capital</p>
+                    <div className="group relative">
+                      <button
+                        aria-label="Show draft view interpretation"
+                        className="flex h-6 w-6 items-center justify-center rounded-full border border-[var(--line)] bg-white text-xs font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-100 hover:text-slate-900 focus-visible:border-slate-400 focus-visible:bg-slate-100 focus-visible:text-slate-900 focus-visible:outline-none"
+                        type="button"
+                      >
+                        i
+                      </button>
+                      <div className="pointer-events-none absolute left-0 top-full z-20 mt-3 w-[min(32rem,calc(100vw-3rem))] rounded-[1.5rem] border border-[var(--line)] bg-white p-5 opacity-0 shadow-[0_20px_60px_rgba(17,32,49,0.16)] transition duration-150 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+                        <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Interpretation</p>
+                        <h3 className="mt-2 text-lg font-semibold text-slate-900">How the draft view reacts</h3>
+                        <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                          <p>
+                            The pick table is sortable by team, year, round, projected slot, and current value. Switch to the order editor when you want to change league order and immediately inspect how owned pick values move.
+                          </p>
+                          <p>
+                            Future-year slots default from the same team&apos;s current-year slot until you override them, so the board stays usable without full manual entry.
+                          </p>
+                          <p>
+                            This matters most when you hold another team&apos;s pick. A 2027 second from San Jose now follows San Jose&apos;s 2027 projected finish instead of your own team record.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                   <h2 className="mt-2 text-2xl font-semibold text-slate-900">Owned picks with live value</h2>
                 </div>
                 <div className="flex gap-2">
@@ -1000,25 +1142,16 @@ export function DashboardShell({ draftOrders, initialSearchParams, players, snap
                 </div>
               ) : null}
             </article>
-            <article className="rounded-[2rem] border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_20px_60px_rgba(17,32,49,0.06)]">
-              <p className="text-xs uppercase tracking-[0.24em] text-slate-500">Interpretation</p>
-              <h2 className="mt-2 text-2xl font-semibold text-slate-900">How the draft view reacts</h2>
-              <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
-                <p>
-                  The pick table is sortable by team, year, round, projected slot, and current value. Switch to the order editor when you want to change league order and immediately inspect how owned pick values move.
-                </p>
-                <p>
-                  Future-year slots default from the same team&apos;s current-year slot until you override them, so the board stays usable without full manual entry.
-                </p>
-                <p>
-                  This matters most when you hold another team&apos;s pick. A 2027 second from San Jose now follows San Jose&apos;s 2027 projected finish instead of your own team record.
-                </p>
-              </div>
-            </article>
           </section>
         ) : null}
 
-        {activeTab === "players" ? <PlayerDirectoryPanel players={players} teams={teams} /> : null}
+        {activeTab === "players" ? (
+          <PlayerDirectoryPanel
+            players={players}
+            teams={teams}
+            nhlStatsRefreshEnabled={source.resolvedMode === "live-file"}
+          />
+        ) : null}
 
         {isTabPending && pendingTab === "players" ? (
           <div className="pointer-events-none fixed inset-0 z-40 flex items-center justify-center bg-[rgba(243,244,248,0.74)] backdrop-blur-sm">

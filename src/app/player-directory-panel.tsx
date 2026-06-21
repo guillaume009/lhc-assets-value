@@ -10,10 +10,11 @@ import type { DirectoryPlayer } from "@/lib/player-directory";
 type PlayerDirectoryPanelProps = {
   players: DirectoryPlayer[];
   teams: string[];
+  nhlStatsRefreshEnabled?: boolean;
 };
 
 type DirectoryView = "table" | "cards";
-type DirectorySortKey = "name" | "team" | "position" | "age" | "score" | "capHit";
+type DirectorySortKey = "name" | "team" | "position" | "age" | "score" | "capHit" | "adjustedUpside";
 type SortDirection = "asc" | "desc";
 
 const sortPlayers = (
@@ -36,6 +37,8 @@ const sortPlayers = (
           return left.capHit - right.capHit;
         case "score":
           return left.score - right.score;
+        case "adjustedUpside":
+          return left.adjustedUpside - right.adjustedUpside;
       }
     })();
 
@@ -54,7 +57,28 @@ const ringStyle = (value: number) => ({
   background: `conic-gradient(var(--accent) ${value}%, rgba(15,118,110,0.12) ${value}% 100%)`,
 });
 
-export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelProps) {
+const summaryCardClass =
+  "rounded-[1.5rem] border border-[var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,250,252,0.94))] p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.72)]";
+
+const playerCardClass =
+  "group relative cursor-pointer overflow-hidden rounded-[1.75rem] border border-[var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,252,0.92))] p-5 shadow-[0_20px_60px_rgba(17,32,49,0.06)] transition hover:bg-[linear-gradient(180deg,rgba(255,255,255,0.98),rgba(239,246,255,0.94))]";
+
+const playerCardInsetClass =
+  "rounded-2xl border border-[rgba(16,24,40,0.06)] bg-[linear-gradient(180deg,rgba(255,255,255,0.94),rgba(248,250,252,0.92))] p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.68)]";
+
+type RefreshState = {
+  tone: "neutral" | "success" | "warning" | "error";
+  message: string;
+} | null;
+
+const refreshStateToneClassName: Record<NonNullable<RefreshState>["tone"], string> = {
+  neutral: "border-[var(--line)] bg-white/85 text-slate-700",
+  success: "border-emerald-200 bg-emerald-50 text-emerald-900",
+  warning: "border-amber-200 bg-amber-50 text-amber-900",
+  error: "border-rose-200 bg-rose-50 text-rose-900",
+};
+
+export function PlayerDirectoryPanel({ players, teams, nhlStatsRefreshEnabled = false }: PlayerDirectoryPanelProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [teamFilter, setTeamFilter] = useState("all");
@@ -64,6 +88,8 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
   const [sortKey, setSortKey] = useState<DirectorySortKey>("score");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [isViewPending, startViewTransition] = useTransition();
+  const [isRefreshPending, startRefreshTransition] = useTransition();
+  const [refreshState, setRefreshState] = useState<RefreshState>(null);
 
   const positions = [...new Set(players.map((player) => player.position))].sort();
 
@@ -94,6 +120,7 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
       : Math.round(sortedPlayers.reduce((total, player) => total + player.score, 0) / sortedPlayers.length);
   const ownTeamCount = sortedPlayers.filter((player) => player.isOwnTeam).length;
   const highValueCount = sortedPlayers.filter((player) => player.score >= 76).length;
+  const positiveIrlUpsideCount = sortedPlayers.filter((player) => (player.realUpsideProfile?.adjustment ?? 0) > 0).length;
 
   const toggleSort = (nextSortKey: DirectorySortKey) => {
     if (nextSortKey === sortKey) {
@@ -122,6 +149,56 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
     router.push(`/players/${encodeURIComponent(playerId)}`);
   };
 
+  const refreshVisiblePlayers = () => {
+    const visiblePlayerIds = sortedPlayers.map((player) => player.id);
+
+    if (visiblePlayerIds.length === 0) {
+      setRefreshState({ tone: "warning", message: "There are no visible players to refresh." });
+      return;
+    }
+
+    startRefreshTransition(async () => {
+      setRefreshState({ tone: "neutral", message: `Refreshing NHL stats for ${visiblePlayerIds.length} visible players...` });
+
+      try {
+        const response = await fetch("/api/import/nhl/player-stats?force=true", {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ playerIds: visiblePlayerIds }),
+        });
+
+        const payload = (await response.json().catch(() => ({}))) as {
+          ok?: boolean;
+          error?: string;
+          refreshedPlayerCount?: number;
+          targetPlayerCount?: number;
+        };
+
+        if (!response.ok || payload.ok === false) {
+          setRefreshState({
+            tone: "error",
+            message: payload.error ?? "Visible-player NHL stats refresh failed.",
+          });
+          return;
+        }
+
+        setRefreshState({
+          tone: "success",
+          message: `NHL stats refreshed for ${payload.targetPlayerCount ?? visiblePlayerIds.length} visible players.`,
+        });
+        router.refresh();
+      } catch (error) {
+        setRefreshState({
+          tone: "error",
+          message: error instanceof Error ? error.message : "Visible-player NHL stats refresh failed.",
+        });
+      }
+    });
+  };
+
   return (
     <div className="relative">
       {isViewPending ? (
@@ -136,25 +213,30 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.16),transparent_32%),radial-gradient(circle_at_top_right,rgba(225,29,72,0.18),transparent_28%),linear-gradient(135deg,rgba(255,255,255,0.55),transparent_50%)]" />
         <div className="relative space-y-5 px-5 py-6 sm:px-6 lg:px-8 lg:py-8">
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            <div className="rounded-[1.5rem] border border-[var(--line)] bg-white/80 p-4 backdrop-blur">
+            <div className={summaryCardClass}>
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Visible players</p>
               <p className="mt-3 text-3xl font-semibold text-slate-900">{sortedPlayers.length}</p>
               <p className="mt-2 text-sm text-slate-600">Across {teams.length} teams</p>
             </div>
-            <div className="rounded-[1.5rem] border border-[var(--line)] bg-white/80 p-4 backdrop-blur">
+            <div className={summaryCardClass}>
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Average value</p>
               <p className="mt-3 text-3xl font-semibold text-slate-900">{averageScore}</p>
               <p className="mt-2 text-sm text-slate-600">Mean score after filters</p>
             </div>
-            <div className="rounded-[1.5rem] border border-[var(--line)] bg-white/80 p-4 backdrop-blur">
+            <div className={summaryCardClass}>
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Own roster</p>
               <p className="mt-3 text-3xl font-semibold text-slate-900">{ownTeamCount}</p>
               <p className="mt-2 text-sm text-slate-600">Current-team players</p>
             </div>
-            <div className="rounded-[1.5rem] border border-[var(--line)] bg-white/80 p-4 backdrop-blur">
+            <div className={summaryCardClass}>
               <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Core assets</p>
               <p className="mt-3 text-3xl font-semibold text-slate-900">{highValueCount}</p>
               <p className="mt-2 text-sm text-slate-600">Score 76 and above</p>
+            </div>
+            <div className={summaryCardClass}>
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Positive IRL upside</p>
+              <p className="mt-3 text-3xl font-semibold text-slate-900">{positiveIrlUpsideCount}</p>
+              <p className="mt-2 text-sm text-slate-600">Players lifted by NHL trend</p>
             </div>
           </div>
           <div className="space-y-4 rounded-[1.5rem] border border-[var(--line)] bg-white/70 p-4 backdrop-blur">
@@ -163,7 +245,17 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
                 <p>Dense board, fast scanning, direct profile jump.</p>
                 <p>Showing {sortedPlayers.length} of {players.length} players in the current filtered view.</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap justify-end gap-2">
+                {nhlStatsRefreshEnabled ? (
+                  <button
+                    className="rounded-full border border-[var(--line)] bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={isRefreshPending || sortedPlayers.length === 0}
+                    onClick={refreshVisiblePlayers}
+                    type="button"
+                  >
+                    {isRefreshPending ? "Refreshing visible players..." : `Refresh visible players (${sortedPlayers.length})`}
+                  </button>
+                ) : null}
                 <button
                   className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${view === "table" ? "border-[var(--accent)] bg-[rgba(37,99,235,0.12)] text-[var(--accent)] shadow-[0_10px_24px_rgba(37,99,235,0.18)]" : "border-[var(--line)] bg-slate-100 text-slate-700 hover:bg-slate-200 hover:text-slate-900"}`}
                   onClick={() => handleViewChange("table")}
@@ -180,6 +272,11 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
                 </button>
               </div>
             </div>
+            {refreshState ? (
+              <p className={`rounded-[1.25rem] border px-4 py-3 text-sm leading-6 ${refreshStateToneClassName[refreshState.tone]}`}>
+                {refreshState.message}
+              </p>
+            ) : null}
             <div className="flex flex-wrap gap-3">
               <label className="min-w-[14rem] flex-1 text-sm text-slate-700">
                 <span className="mb-2 block text-xs uppercase tracking-[0.18em] text-slate-500">Search players</span>
@@ -236,6 +333,7 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
                     ["age", "Age"],
                     ["capHit", "Cap"],
                     ["score", "Value"],
+                    ["adjustedUpside", "IRL Up"],
                   ] as const).map(([key, label]) => (
                     <th key={key} className="px-4 py-3 font-medium">
                       <button className="flex items-center gap-2" onClick={() => toggleSort(key)} type="button">
@@ -300,6 +398,14 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
                         </div>
                       </div>
                     </td>
+                    <td className="px-4 py-4 align-top text-sm text-slate-700">
+                      <div className="font-semibold text-slate-900">{player.adjustedUpside}</div>
+                      <div className="mt-1 text-xs uppercase tracking-[0.18em] text-slate-500">
+                        {player.realUpsideProfile?.adjustment
+                          ? `${player.realUpsideProfile.adjustment > 0 ? "+" : ""}${player.realUpsideProfile.adjustment} IRL`
+                          : "Flat"}
+                      </div>
+                    </td>
                     <td className="px-4 py-4 align-top text-sm text-slate-700">{player.market}</td>
                   </tr>
                 ))}
@@ -312,7 +418,7 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
           {sortedPlayers.map((player) => (
             <article
               key={player.id}
-              className="group relative cursor-pointer overflow-hidden rounded-[1.75rem] border border-[var(--line)] bg-[var(--surface)] p-5 shadow-[0_20px_60px_rgba(17,32,49,0.06)] transition hover:bg-[rgba(219,234,254,0.35)]"
+              className={playerCardClass}
               onClick={() => openPlayerProfile(player.id)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
@@ -323,7 +429,7 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
               role="link"
               tabIndex={0}
             >
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(15,118,110,0.12),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(180,83,9,0.16),transparent_34%)]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.12),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(225,29,72,0.14),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.18),transparent_48%)]" />
               <div className="relative">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
@@ -354,20 +460,31 @@ export function PlayerDirectoryPanel({ players, teams }: PlayerDirectoryPanelPro
                   <div className="h-full rounded-full bg-[var(--accent)]" style={{ width: `${player.score}%` }} />
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-                  <div className="rounded-2xl bg-white/85 p-3">
+                  <div className={playerCardInsetClass}>
                     <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Market</p>
                     <p className="mt-2 font-semibold text-slate-900">{player.market}</p>
                   </div>
-                  <div className="rounded-2xl bg-white/85 p-3">
+                  <div className={playerCardInsetClass}>
                     <p className="text-xs uppercase tracking-[0.18em] text-slate-500">Cap hit</p>
                     <p className="mt-2 font-semibold text-slate-900">${player.capHit.toFixed(1)}M</p>
                   </div>
+                  <div className={`${playerCardInsetClass} col-span-2`}>
+                    <p className="text-xs uppercase tracking-[0.18em] text-slate-500">IRL upside</p>
+                    <p className="mt-2 font-semibold text-slate-900">
+                      {player.adjustedUpside}
+                      <span className="ml-2 text-sm text-slate-600">
+                        {player.realUpsideProfile?.adjustment
+                          ? `${player.realUpsideProfile.adjustment > 0 ? "+" : ""}${player.realUpsideProfile.adjustment} from NHL trend`
+                          : "No current adjustment"}
+                      </span>
+                    </p>
+                  </div>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <span className="rounded-full border border-[var(--line)] bg-white/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-600">
+                  <span className="rounded-full border border-[var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,250,252,0.92))] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-600">
                     {player.tradeRange}
                   </span>
-                  <span className="rounded-full border border-[var(--line)] bg-white/80 px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-600">
+                  <span className="rounded-full border border-[var(--line)] bg-[linear-gradient(180deg,rgba(255,255,255,0.95),rgba(248,250,252,0.92))] px-3 py-1 text-[11px] font-medium uppercase tracking-[0.18em] text-slate-600">
                     {player.isOwnTeam ? "Current roster" : "Other team"}
                   </span>
                 </div>

@@ -72,14 +72,35 @@ export function PlayerHeadshot({
   imageClassName,
 }: PlayerHeadshotProps) {
   const cacheKey = name.trim().toLowerCase();
+
+  return (
+    <PlayerHeadshotInner
+      key={cacheKey}
+      alt={alt}
+      cacheKey={cacheKey}
+      className={className}
+      fallbackClassName={fallbackClassName}
+      imageClassName={imageClassName}
+      name={name}
+    />
+  );
+}
+
+type PlayerHeadshotInnerProps = PlayerHeadshotProps & {
+  cacheKey: string;
+};
+
+function PlayerHeadshotInner({
+  name,
+  alt,
+  cacheKey,
+  className,
+  fallbackClassName,
+  imageClassName,
+}: PlayerHeadshotInnerProps) {
   const containerRef = useRef<HTMLSpanElement | null>(null);
   const [headshotUrl, setHeadshotUrl] = useState<string | null>(() => resolvedHeadshots.get(cacheKey) ?? null);
   const [shouldResolve, setShouldResolve] = useState(() => resolvedHeadshots.has(cacheKey));
-
-  useEffect(() => {
-    setHeadshotUrl(resolvedHeadshots.get(cacheKey) ?? null);
-    setShouldResolve(resolvedHeadshots.has(cacheKey));
-  }, [cacheKey]);
 
   useEffect(() => {
     if (shouldResolve) {
@@ -137,7 +158,6 @@ export function PlayerHeadshot({
           alt={alt ?? `${name} headshot`}
           className={imageClassName ?? className}
           height={256}
-          loader={({ src }) => src}
           sizes="(max-width: 768px) 96px, 160px"
           src={headshotUrl}
           unoptimized

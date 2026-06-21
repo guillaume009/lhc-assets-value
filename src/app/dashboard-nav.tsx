@@ -1,7 +1,7 @@
 import Link from "next/link";
 
-export type DashboardNavTab = "overview" | "roster" | "market" | "draft" | "players" | "teams" | "trades" | "workbench";
-type DashboardButtonTab = Exclude<DashboardNavTab, "teams" | "trades" | "workbench">;
+export type DashboardNavTab = "overview" | "roster" | "market" | "draft" | "players" | "teams" | "trades" | "workbench" | "admin";
+type DashboardButtonTab = Exclude<DashboardNavTab, "teams" | "trades" | "workbench" | "admin">;
 
 const tabOptions: Array<{ id: DashboardNavTab; label: string; href: string }> = [
   { id: "overview", label: "Overview", href: "/?tab=overview" },
@@ -12,6 +12,7 @@ const tabOptions: Array<{ id: DashboardNavTab; label: string; href: string }> = 
   { id: "teams", label: "Team directory", href: "/teams" },
   { id: "trades", label: "Past trades", href: "/trades" },
   { id: "workbench", label: "Trade workbench", href: "/workbench" },
+  { id: "admin", label: "Data status", href: "/admin/data-status" },
 ];
 
 type DashboardNavProps = {
@@ -21,11 +22,11 @@ type DashboardNavProps = {
 
 export function DashboardNav({ activeTab, onSelectTab }: DashboardNavProps) {
   return (
-    <div className="flex flex-wrap gap-2 rounded-[1.25rem] border border-[var(--line)] bg-white/70 p-2">
+    <div className="inline-flex max-w-full flex-wrap gap-2 rounded-[1.25rem] border border-[var(--line)] bg-white/70 p-2">
       {tabOptions.map((tab) => {
         const isActive = tab.id === activeTab;
         const buttonTab: DashboardButtonTab | null =
-          tab.id !== "teams" && tab.id !== "trades" && tab.id !== "workbench" ? tab.id : null;
+          tab.id !== "teams" && tab.id !== "trades" && tab.id !== "workbench" && tab.id !== "admin" ? tab.id : null;
 
         if (onSelectTab && buttonTab) {
           return (
